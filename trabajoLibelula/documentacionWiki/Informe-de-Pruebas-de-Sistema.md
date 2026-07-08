@@ -5,7 +5,7 @@
 | Campo | Detalle |
 |-------|---------|
 | **Documento** | Informe de Pruebas de Sistema (E2E) — Snipe-IT |
-| **Versión** | 1.1 |
+| **Versión** | 1.2 |
 | **Hito / Sprint** | Hito 3 (Sprint 3–4) |
 | **Nivel de prueba** | Sistema (E2E + no funcional, caja negra sobre el sistema desplegado) |
 | **Herramienta E2E** | Laravel Dusk (recorridos por navegador) · `curl` (mediciones no funcionales HTTP) |
@@ -45,7 +45,7 @@ Los **recorridos E2E funcionales por navegador** (E2E-01…E2E-06) quedan **dise
 | No funcional — Rendimiento (NF-PERF-01) | ✅ Ejecutado (real) |
 | No funcional — Fiabilidad (NF-REL-02) | ✅ Ejecutado (real) |
 | No funcional — NF-SEC-02, NF-PERF-02, NF-REL-01 | 🕗 Pendiente (403 autenticado / dataset de volumen / throttling) |
-| E2E funcional — E2E-01…E2E-06 | 🟡 **Implementados** (`tests/Browser/`, Dusk); **infraestructura verificada** (Selenium+Chrome+app+MariaDB levantan y Dusk ejecuta); **corrida verde pendiente en CI Linux** (ver §5.4) |
+| E2E funcional — E2E-01…E2E-06 | 🟡 **Implementados** (`tests/Browser/`, Dusk); **infraestructura verificada** (Selenium+Chrome+app+MariaDB levantan y Dusk ejecuta); **corrida en CI aún no verde — en estabilización** (ver §5.4) |
 
 ---
 
@@ -106,9 +106,9 @@ Se implementó la automatización E2E completa con **Laravel Dusk**:
 | Stack E2E levanta (Selenium+Chrome+app+MariaDB) | ✅ Verificado |
 | Dusk ejecuta y conecta al navegador (sesiones Chrome) | ✅ Verificado |
 | Migraciones + seed de settings en la BD de prueba | ✅ Verificado |
-| **Corrida E2E en verde (aserciones)** | 🕗 **Pendiente** — se ejecuta en **CI Linux** (`e2e-dusk.yml`) |
+| **Corrida E2E en verde (aserciones)** | ❌ **Aún no verde** — la corrida en **CI** (`e2e-dusk.yml`) **falló** (2026-07-08); requiere estabilización |
 
-> **Motivo de que la corrida verde sea en CI y no en local:** en Windows, la app servida sobre el *bind-mount* de Docker es lenta y rechaza conexiones concurrentes del navegador (`net::ERR_CONNECTION_REFUSED`) — limitación del sistema de archivos de Docker en Windows, **no de las pruebas**. En un runner **Linux nativo** (GitHub Actions) el sistema de archivos es rápido y el problema desaparece. Por eso la ejecución oficial de los E2E se realiza en el **workflow de CI**, lo que además aporta la **evidencia de E2E automatizado en el pipeline** (DevOps).
+> **Estado real (transparente):** los E2E **no están en verde todavía**. En **local (Windows)** la app servida sobre el *bind-mount* de Docker rechaza conexiones del navegador (`net::ERR_CONNECTION_REFUSED`) — limitación del FS de Docker en Windows. Se trasladó la ejecución a **CI Linux** (`e2e-dusk.yml`), donde ese problema no aplica, pero la **primera corrida en CI falló** y requiere **estabilización** (probables ajustes de tiempos de arranque de la app, esperas del navegador y selectores `select2` del checkout). Lo **verificado** es la infraestructura (el stack levanta y **Dusk ejecuta** contra Chrome); la **corrida verde queda como trabajo pendiente**. No se reportan E2E como aprobados.
 
 ---
 
@@ -139,7 +139,7 @@ Se implementó la automatización E2E completa con **Laravel Dusk**:
 | App desplegada y accesible (Docker) | ✅ Verificado |
 | NF de Seguridad/Rendimiento/Fiabilidad ejecutadas | 🟡 Parcial — HTTP-verificables ✅; faltan NF-SEC-02, NF-PERF-02, NF-REL-01 |
 | E2E-01…E2E-06 implementados y con infraestructura funcionando | ✅ (código + Docker Selenium/Chrome + workflow CI) |
-| E2E-01…E2E-06 corrida verde | 🕗 Pendiente — se ejecuta en CI Linux (`e2e-dusk.yml`); bloqueado en local por el FS de Docker en Windows |
+| E2E-01…E2E-06 corrida verde | ❌ Aún no — CI (`e2e-dusk.yml`) falló el 2026-07-08; en estabilización (local bloqueado por el FS de Docker en Windows) |
 | Defectos registrados | ✅ (0 defectos; 1 observación) |
 | Resultados documentados en el Informe | ✅ (este documento) |
 
@@ -149,7 +149,7 @@ Se implementó la automatización E2E completa con **Laravel Dusk**:
 
 1. **El sistema desplegado cumple los controles no funcionales de mayor riesgo verificados:** protege rutas sin sesión (302), presenta cabeceras de seguridad correctas, responde rápido (TTFB ~0.08 s) y maneja errores (404) de forma controlada.
 2. **Selección no funcional fundamentada:** se probaron **3 características por riesgo** (Seguridad, Rendimiento, Fiabilidad, ISO 25010), no todas — coherente con pruebas basadas en riesgo de ISO 29119.
-3. **Automatización E2E lista; ejecución oficial en CI.** Se implementaron los E2E con **Laravel Dusk** y su infraestructura Docker (Selenium/Chrome + app + MariaDB), verificando que el stack levanta y Dusk ejecuta. La **corrida verde se realiza en el workflow `e2e-dusk.yml`** sobre un runner **Linux**, porque el *bind-mount* de Docker en Windows impide servir la app de forma fiable a un navegador (`ERR_CONNECTION_REFUSED`) — limitación de entorno, no de las pruebas. Esto además deja la **evidencia de E2E automatizado en el pipeline** (DevOps).
+3. **Automatización E2E implementada; corrida verde aún pendiente.** Se implementaron los E2E con **Laravel Dusk** y su infraestructura Docker (Selenium/Chrome + app + MariaDB), verificando que el stack levanta y Dusk ejecuta. La ejecución se trasladó a un workflow de **CI Linux** (`e2e-dusk.yml`) porque el *bind-mount* de Docker en Windows impide servir la app de forma fiable al navegador (`ERR_CONNECTION_REFUSED`). La **primera corrida en CI falló** y los E2E **quedan en estabilización** (ajuste de esperas/selectores). Se reporta con transparencia: **no se dan por aprobados**. El valor entregado es la **automatización lista para estabilizar** y la evidencia de que el pipeline E2E existe en DevOps.
 4. **Trabajo siguiente:** completar NF-SEC-02, NF-PERF-02, NF-REL-01 (403 autenticado, dataset de volumen, throttling) y consolidar los recorridos de checkout E2E (refinar los selectores `select2`).
 5. **Reutilización en Aceptación:** los recorridos E2E pueden reformularse como criterios de aceptación (UAT) en el *Informe de Pruebas de Aceptación*.
 
@@ -171,5 +171,6 @@ Se implementó la automatización E2E completa con **Laravel Dusk**:
 |---------|-------|---------|
 | 1.0 | 2026-07-08 | Informe inicial: ejecución de no funcionales HTTP (NF-SEC/PERF/REL, 4/4 PASS con datos reales sobre la app desplegada); E2E funcionales diseñados y pendientes de ejecución con Dusk; métricas y criterios de salida. |
 | 1.1 | 2026-07-08 | Automatización E2E implementada (Laravel Dusk) + infraestructura Docker (Selenium/Chrome) + workflow CI `e2e-dusk.yml`. §5.4 con el **estado de ejecución transparente**: stack y Dusk verificados; **corrida verde pendiente en CI Linux** (el bind-mount de Docker en Windows impide la corrida local). Sin inflar resultados. |
+| 1.2 | 2026-07-08 | Corregido tras el resultado real: la **primera corrida E2E en CI falló**; se marca como **"aún no verde / en estabilización"** en §3, §5.4, §8 y §9 (sin reportar E2E como aprobados). Las pruebas no funcionales de sistema permanecen ejecutadas y verdes (4/4). |
 
 *Fin del documento — Informe de Pruebas de Sistema (E2E).*
