@@ -5,12 +5,13 @@
 | Campo | Detalle |
 |-------|---------|
 | **Documento** | Plan de Pruebas de Integración — Snipe-IT |
-| **Versión** | 1.2 |
-| **Hito / Sprint** | Hito 2 / Sprint 2 (plan) → ejecución en Hito 3 |
+| **Versión** | 1.3 |
+| **Hito / Sprint** | Hito 2 / Sprint 2 (plan) → **ejecución completada en Hito 3** |
 | **Nivel de prueba** | Integración (componentes e interfaces) — alcance *Small* (subsistemas internos) |
 | **Herramienta** | PHPUnit (suite `Feature`) sobre SQLite en memoria — equivalente en el stack PHP/Laravel a Supertest (pruebas de integración HTTP por código, versionadas en el repo); Postman/Newman como complemento para el contrato de la API v1 |
 | **Fecha de elaboración** | 2026-06-12 |
-| **Última revisión** | 2026-07-04 (v1.1: correcciones de verificación, entorno común, matriz heredado/aporte, fallas de interfaz y formato de casos) |
+| **Última revisión** | 2026-07-08 (v1.3: ejecución del Hito 3 completada — los 24 casos del aporte implementados y verdes; resultados en el Informe) |
+| **Ejecución (resultados)** | Ver **[Informe de Pruebas de Integración](Informe-de-Pruebas-de-Integracion)** v1.2 |
 | **Estándar** | ISO/IEC/IEEE 29119-3 |
 
 ---
@@ -137,11 +138,11 @@ Cada falla que revele un defecto se documenta con la **plantilla de Reporte de I
 | CP-07 | `Checkins/Ui/AccessoryCheckinTest.php` | `POST accessories/{accessoryID}/checkin` | Accesorio entregado | Unidad devuelta; disponibles +1 | ⟦pendiente⟧ |
 | CP-08 | `Checkouts/Ui/ComponentsCheckoutTest.php` | `POST components/{componentID}/checkout` | Componente + activo destino | Cantidad asignada al activo | ⟦pendiente⟧ |
 | CP-09 | `Assets/Api/*` | `POST api/v1/hardware/{asset}/checkout` | Checkout vía API con token | JSON `status=success`; Transformer esperado | ⟦pendiente⟧ |
-| CP-FI-01 | `Integracion/AssetCheckoutInterfaceTest.php` *(a crear)* | `POST hardware/{assetId}/checkout` | Sintáctica: falta destino; status no numérico | Errores de validación; sin asignación | ⟦pendiente⟧ |
-| CP-FI-02 | `Integracion/AssetCheckoutInterfaceTest.php` *(a crear)* | `POST hardware/{assetId}/checkout` | Semántica: `expected_checkin` < `checkout_at` | Rechazo; sin asignación | ⟦pendiente⟧ |
-| CP-FI-03 | `Integracion/AssetCheckoutInterfaceTest.php` *(a crear)* | `POST hardware/{assetId}/checkout` | Estado: segundo checkout sobre activo asignado | Rechazo; sin doble asignación | ⟦pendiente⟧ |
-| CP-11 | `Integracion/FmcsCrossCompanyTest.php` *(a crear)* | `POST hardware/{assetId}/checkout` | FMCS ON; activo empresa A → usuario empresa B | Rechazo (bloqueo cross-company) | ⟦pendiente⟧ |
-| CP-12 | `Integracion/LicenseSeatExhaustionTest.php` *(a crear)* | `POST licenses/{licenseId}/checkout` | Licencia con 0 asientos libres | Rechazo; sin asignación | ⟦pendiente⟧ |
+| CP-FI-01 | `Integracion/AssetCheckoutInterfaceTest.php` | `POST hardware/{assetId}/checkout` | Sintáctica: falta destino; status no numérico | Errores de validación; sin asignación | ⟦pendiente⟧ |
+| CP-FI-02 | `Integracion/AssetCheckoutInterfaceTest.php` | `POST hardware/{assetId}/checkout` | Semántica: `expected_checkin` < `checkout_at` | Rechazo; sin asignación | ⟦pendiente⟧ |
+| CP-FI-03 | `Integracion/AssetCheckoutInterfaceTest.php` | `POST hardware/{assetId}/checkout` | Estado: segundo checkout sobre activo asignado | Rechazo; sin doble asignación | ⟦pendiente⟧ |
+| CP-11 | `Integracion/FmcsCrossCompanyTest.php` | `POST hardware/{assetId}/checkout` | FMCS ON; activo empresa A → usuario empresa B | Rechazo (bloqueo cross-company) | ⟦pendiente⟧ |
+| CP-12 | `Integracion/LicenseSeatExhaustionTest.php` | `POST licenses/{licenseId}/checkout` | Licencia con 0 asientos libres | Rechazo; sin asignación | ⟦pendiente⟧ |
 
 ---
 
@@ -193,7 +194,7 @@ php artisan test tests/Feature/Checkouts                      # por subsistema
 - ✅ Runner Docker operativo en ambas variantes: `test` (SQLite) y `test-mysql` (MariaDB). La imagen construye y ejecuta `--testsuite=Feature`.
 - ✅ Incidencia de memoria resuelta (`memory_limit=-1` fijado en el `php.ini` de la imagen).
 - ✅ La variante **`test-mysql`** elimina las diferencias de dialecto SQLite (mitiga el riesgo **RI-03**) → es la recomendada para la **corrida oficial**.
-- 📄 **Resultados de la corrida de verificación:** ver `HITO-3/Integracion/Evidencias/RESULTADO-CORRIDA-DOCKER-Feature.md` y el futuro **Informe de Integración**.
+- 📄 **Resultados de la corrida de verificación:** ver `HITO-3/Integracion/Evidencias/RESULTADO-CORRIDA-DOCKER-Feature.md` y el **[Informe de Integración](Informe-de-Pruebas-de-Integracion)** (v1.2, ejecución completa: 24 casos del aporte, 24/24 en SQLite · 19 + 5 incomplete en MariaDB).
 
 ---
 
@@ -240,6 +241,7 @@ Los flujos INT-XX se vinculan a los requisitos funcionales (RF-XX) y a los casos
 | 1.0 | 2026-06-12 | Plan inicial (Hito 2). |
 | 1.1 | 2026-07-04 | Cifra corregida (1509 métodos); §2.4 matriz heredado/aporte; §3 terminología Modelo-V (Small/Bottom-Up/mocks); §4.1 fallas de interfaz; §4.2 casos en formato del grupo; §5 entorno común + fix de memoria; flujos INT-11/12/13; criterios de salida y riesgo RI-05. |
 | 1.2 | 2026-07-04 | Añadida variante Docker `test-mysql` (MariaDB) en §5.2. **Separación Plan/Informe:** el §5.3 deja de contener resultados de ejecución (movidos al Informe/evidencia) y pasa a ser verificación de entorno. Los resultados y defectos se reportan en el Informe de Integración. |
+| 1.3 | 2026-07-08 | **Ejecución del Hito 3 completada.** Los archivos de test del aporte (§4.2) fueron creados y ejecutados (se retira la etiqueta "a crear"): FI-01/02/03, CPF-08, INT-07 (FMCS), INT-11/12/13 → 24 casos. Resultados en el **Informe v1.2**. FI-02 halló el defecto del sistema INC-02 (corregido). Plan cubierto al 100 %. |
 
 ---
 

@@ -5,12 +5,12 @@
 | Campo | Detalle |
 |-------|---------|
 | **Documento** | Informe de Pruebas de Integración — Snipe-IT |
-| **Versión** | 1.1 |
-| **Hito / Sprint** | Hito 3 (ejecución) |
+| **Versión** | 1.2 |
+| **Hito / Sprint** | Hito 3 (ejecución) — **cerrado** |
 | **Nivel de prueba** | Integración (componentes e interfaces) — alcance *Small* |
 | **Herramienta** | PHPUnit (suite `Feature`) — rol de Supertest en el stack PHP/Laravel |
 | **Entorno** | Runner Docker (`docker-compose.test.yml`): SQLite `:memory:` y MariaDB 11.4.7 |
-| **Fecha de ejecución** | 2026-07-04 (suite heredada) · 2026-07-05 (FI-01/FI-02) |
+| **Fecha de ejecución** | 2026-07-04 (suite heredada) · 2026-07-05 (FI-01/FI-02) · 2026-07-08 (FI-03, CPF-08, INT-07/11/12/13) |
 | **Estándar** | ISO/IEC/IEEE 29119-3 (Test Completion Report) |
 
 ---
@@ -25,6 +25,8 @@ Se ejecutó la **suite de integración** de Snipe-IT (`tests/Feature`, nivel int
 **Veredicto global: la integración entre subsistemas es correcta.** Tras el fix y usando la variante MariaDB, **no quedan fallos reales**. Se detectó y documentó **1 incidente** (defecto de prueba, resuelto).
 
 **Actualización v1.1 (2026-07-05):** se implementaron y ejecutaron los casos de **inyección de fallas de interfaz FI-01 y FI-02** (aporte propio, `tests/Feature/Integracion/AssetCheckoutInterfaceTest.php`, 4 métodos). **FI-02 reveló un defecto real del sistema (INC-02):** Snipe-IT aceptaba un checkout con fecha esperada de devolución anterior a la fecha de entrega. Se corrigió con una regla de validación y se verificó con una regresión de 140 tests sin fallos (§7).
+
+**Cierre v1.2 (2026-07-08): pruebas de integración COMPLETADAS.** Se implementó y ejecutó el resto del aporte propio en `tests/Feature/Integracion/`: **FI-03** (resiliencia/doble checkout), **CPF-08** (agotamiento de asientos de licencia), **INT-07** (FMCS cross-company), **INT-11** (CustomFields ↔ Asset), **INT-12** (Depreciación) e **INT-13** (StatusLabel ↔ disponibilidad). La carpeta suma **24 casos**: **24/24 PASS en SQLite** y **19 PASS + 5 incomplete en MariaDB** (los 5 de campos personalizados se omiten por diseño en MySQL, como en la suite original). El plan de integración queda **cubierto al 100 %**.
 
 ---
 
@@ -107,6 +109,18 @@ El laboratorio del docente usa **Supertest/Postman (Node)**, pero permite elegir
 | CP-FI-02 | `Integracion/AssetCheckoutInterfaceTest.php` | `POST hardware/{assetId}/checkout` | Semántica: `expected_checkin` **anterior** a `checkout_at` | Rechazo por validación de fecha; sin asignación | ⛔ FAIL 1.ª corrida → **INC-02** → ✅ PASS tras fix |
 | CP-FI-02-API | `Integracion/AssetCheckoutInterfaceTest.php` | `POST api/v1/hardware/{asset}/checkout` | La misma falla semántica por la capa REST | `status=error`; sin asignación | ⛔ FAIL 1.ª corrida (respondía `success`) → ✅ PASS tras fix |
 
+**Casos nuevos del grupo — resiliencia y refuerzos (2026-07-08):**
+
+| #CP | Archivo de Prueba | Endpoint / Frontera | Entrada | Esperado | Real |
+|-----|-------------------|---------------------|---------|----------|------|
+| CP-FI-03 | `Integracion/AssetCheckoutInterfaceTest.php` | `POST hardware/{assetId}/checkout` | Resiliencia/estado: 2.º checkout sobre activo ya asignado | Rechazo (`error`); sin doble asignación | ✅ PASS |
+| CP-08 | `Integracion/LicenseSeatExhaustionTest.php` | `POST licenses/{licenseId}/checkout` | Licencia con 0 asientos libres | Rechazo; sin sobre-asignación | ✅ PASS |
+| CP-INT07a | `Integracion/FmcsCrossCompanyTest.php` | `POST hardware/{assetId}/checkout` | FMCS ON; activo empresa A → usuario empresa B | Rechazo; activo sin asignar | ✅ PASS |
+| CP-INT07b | `Integracion/FmcsCrossCompanyTest.php` | `POST hardware/{assetId}/checkout` | FMCS ON; activo y usuario de la MISMA empresa | Checkout procede | ✅ PASS |
+| CP-INT11 | `Integracion/CustomFieldAssetTest.php` | `POST hardware` (store) | Campo personalizado válido/ inválido/ requerido omitido | Persistencia o rechazo según regla | ✅ PASS (SQLite); omitido en MySQL por diseño |
+| CP-INT12 | `Integracion/DepreciacionIntegracionTest.php` | `Asset::getLinearDepreciatedValue()` | Costo + fecha compra + depreciación (vía modelo) | Valor depreciado coherente (0…costo, monótono) | ✅ PASS |
+| CP-INT13 | `Integracion/StatusLabelDisponibilidadTest.php` | `availableForCheckout()` / `POST .../checkout` | Estados deployable / pending / archived / undeployable | Elegible solo si deployable | ✅ PASS |
+
 > La tabla completa de casos y su mapeo a endpoints está en el Plan §4.2. La evidencia de la corrida está en `HITO-3/Integracion/Evidencias/RESULTADO-CORRIDA-DOCKER-Feature.md`.
 
 **Matriz heredado vs aporte del grupo (síntesis):**
@@ -114,9 +128,9 @@ El laboratorio del docente usa **Supertest/Postman (Node)**, pero permite elegir
 | | Heredado (proyecto original) | Aporte del grupo (Hito 3) |
 |--|------------------------------|---------------------------|
 | Flujos | INT-01…INT-10 (292 archivos / 1509 métodos) | Ejecución + documentación + entorno Docker reproducible |
-| Tests propios | — | 1 test de integración (`AssetCheckoutTest::test_license_seats_are_assigned_to_user_upon_checkout`), **corregido** · **FI-01/FI-02** (`Integracion/AssetCheckoutInterfaceTest.php`, 4 métodos / 18 aserciones) |
+| Tests propios | — | **Suite `tests/Feature/Integracion/` completa (24 casos):** FI-01/02/03, CPF-08, INT-07, INT-11, INT-12, INT-13 + corrección del test heredado de asientos de licencia |
 | Análisis | — | Clasificación de 4 fallos (3 dialecto + 1 defecto de prueba) · **1 defecto del sistema encontrado y corregido (INC-02)** |
-| Pendiente | — | FI-03 + INT-11/12/13 (diseñados, por implementar) |
+| Cobertura de aporte | — | ✅ **Completo** — todos los flujos nuevos diseñados en el Plan fueron implementados y ejecutados |
 
 ---
 
@@ -170,11 +184,11 @@ El laboratorio del docente usa **Supertest/Postman (Node)**, pero permite elegir
 | PASS (tras fix + MariaDB) | 1653 (100 % de dialecto/lógica) |
 | Defectos de prueba encontrados | 1 (INC-01, resuelto) |
 | **Defectos del sistema encontrados** | **1 (INC-02, detectado por CP-FI-02, resuelto)** |
-| Tests nuevos del grupo ejecutados | 4 métodos / 18 aserciones (FI-01a/b, FI-02 UI/API) — 4/4 PASS tras fix |
+| **Tests nuevos del grupo (`tests/Feature/Integracion/`)** | **24 casos — SQLite: 24/24 PASS · MariaDB: 19 PASS + 5 incomplete (CustomFields, por diseño)** |
 | Regresión del fix INC-02 | 140 tests / 488 aserciones — 0 fallos |
 | Observaciones de entorno | 1 (OBS-01, dialecto) |
-| Aserciones totales (corrida) | 6090 |
-| Duración corrida completa | ~32 min |
+| Aserciones totales (suite heredada) | 6090 |
+| Duración corrida completa (heredada) | ~32 min |
 
 ---
 
@@ -185,7 +199,7 @@ El laboratorio del docente usa **Supertest/Postman (Node)**, pero permite elegir
 | Flujos INT-01…INT-10 ejecutados y documentados | ✅ |
 | Cero FAIL al cierre (o defectos registrados) | ✅ (INC-01 e INC-02 resueltos; 3 dialecto documentados) |
 | Defectos registrados con Reporte de Incidente | ✅ (INC-01, INC-02) |
-| Tests nuevos del grupo: FI-01/02/03 e INT-11/12/13 | 🟡 Parcial — **FI-01 y FI-02 ✅ ejecutados**; FI-03 e INT-11/12/13 pendientes |
+| Tests nuevos del grupo: FI-01/02/03, CPF-08, INT-07, INT-11/12/13 | ✅ **Completo** — 24 casos implementados y ejecutados |
 | Resultados documentados en el Informe | ✅ (este documento) |
 
 ---
@@ -196,8 +210,9 @@ El laboratorio del docente usa **Supertest/Postman (Node)**, pero permite elegir
 2. **Las pruebas unitarias exitosas no bastan:** la corrida reveló un defecto de prueba (INC-01) que solo emerge al ejercitar la pila completa con eventos/listeners reales.
 3. **El motor de BD importa (RI-03):** SQLite genera falsos negativos por dialecto; la variante **`test-mysql`** debe ser la **corrida oficial** (paridad con producción/COTS = integración *Large*).
 4. **Entorno reproducible logrado:** el runner Docker garantiza mismas condiciones para todo el grupo y resuelve la incidencia de memoria.
-5. **La inyección de fallas rinde frutos (v1.1):** los casos **FI-01/FI-02** validaron el manejo de peticiones erróneas o malintencionadas en la capa de control, y **FI-02 destapó un defecto real del sistema (INC-02)** — Snipe-IT aceptaba una devolución anterior a la entrega — corregido y verificado con regresión completa. Esto confirma que las suites heredadas, aun siendo amplias, no cubrían la coherencia semántica entre fechas.
-6. **Recomendación / trabajo siguiente:** implementar y ejecutar **FI-03** (resiliencia/doble checkout) e **INT-11/12/13** (áreas débiles), ya diseñados en el Plan, para completar el aporte propio del grupo.
+5. **La inyección de fallas rinde frutos:** los casos **FI-01/FI-02/FI-03** validaron el manejo de peticiones erróneas, malintencionadas o en colisión de estado en la capa de control, y **FI-02 destapó un defecto real del sistema (INC-02)** — Snipe-IT aceptaba una devolución anterior a la entrega — corregido y verificado con regresión completa. Esto confirma que las suites heredadas, aun siendo amplias, no cubrían la coherencia semántica entre fechas.
+6. **Aporte del grupo completado:** se implementaron y ejecutaron los **24 casos** de `tests/Feature/Integracion/` (FI-01/02/03, CPF-08, INT-07 FMCS, INT-11 CustomFields, INT-12 Depreciación, INT-13 StatusLabel), verdes en SQLite y en MariaDB (salvo los de campos personalizados, omitidos por diseño en MySQL como en la suite original). El plan de pruebas de integración queda **cubierto al 100 %**.
+7. **Trabajo siguiente (no-código):** publicación en Wiki, cierre de Issues/Project y presentación del Sprint 3; a futuro, integración *Large* (LDAP/SAML/correo real) con dobles de prueba.
 
 ---
 
@@ -221,5 +236,6 @@ El error "Allowed memory size exhausted" al correr toda la suite se debía al `m
 |---------|-------|---------|
 | 1.0 | 2026-07-04 | Informe inicial: ejecución de la suite de integración en Docker, clasificación de 4 fallos (3 dialecto + INC-01 resuelto), matriz heredado/aporte, métricas, cuestionario. |
 | 1.1 | 2026-07-05 | Resultado Real de FI-01/FI-02 (inyección de fallas de interfaz, `AssetCheckoutInterfaceTest.php`); reporte de incidente **INC-02** (defecto del sistema: `expected_checkin` anterior a `checkout_at` aceptado) con fix verificado y regresión de 140 tests. Autor: Jeanpiero. |
+| 1.2 | 2026-07-08 | **Cierre de integración:** FI-03, CPF-08, INT-07 (FMCS), INT-11, INT-12, INT-13 implementados y ejecutados (24 casos en `tests/Feature/Integracion/`). Corrida oficial MariaDB 19 PASS + 5 incomplete (CustomFields por diseño). Actualizados §3, §6, §8, §9, §10 y matriz. Plan cubierto al 100 %. |
 
 *Fin del documento — Informe de Pruebas de Integración (Hito 3).*
