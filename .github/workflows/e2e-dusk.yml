@@ -1,0 +1,59 @@
+name: E2E Tests (Dusk + Selenium)
+
+# Pruebas de Sistema (E2E) por navegador real, ejecutadas en Linux.
+# En un runner Linux el sistema de archivos es nativo (no bind-mount de Windows),
+# por lo que la app servida responde con normalidad y los E2E corren estables.
+# Reutiliza trabajoLibelula/HITO-3/Sistema/docker-compose.e2e.yml
+# (Chrome via Selenium + app Snipe-IT + MariaDB, todo en la red interna de Docker).
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+      - dev-wilson-integracion
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    name: E2E (Laravel Dusk sobre Chrome headless)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, pdo, pdo_mysql, gd, intl, zip, bcmath, exif, ldap, curl, fileinfo, iconv, json
+          tools: composer:v2
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare Laravel storage
+        run: |
+          mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache
+          chmod -R 777 storage bootstrap/cache
+
+      - name: Run E2E (Dusk + Selenium en Docker)
+        run: >
+          docker compose -f trabajoLibelula/HITO-3/Sistema/docker-compose.e2e.yml
+          up --build --exit-code-from dusk dusk
+
+      - name: Upload Dusk screenshots (si falla)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dusk-screenshots
+          path: tests/Browser/screenshots
+          if-no-files-found: ignore
+
+      - name: Tear down
+        if: always()
+        run: >
+          docker compose -f trabajoLibelula/HITO-3/Sistema/docker-compose.e2e.yml
+          down -v
