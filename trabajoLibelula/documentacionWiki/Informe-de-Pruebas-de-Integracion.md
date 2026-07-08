@@ -44,9 +44,13 @@ Se ejecutó la **suite de integración** de Snipe-IT (`tests/Feature`, nivel int
 | INT-04 (aporte) | Asiento de licencia asignado en checkout — test del grupo | ✅ Ejecutado y **corregido** |
 | FI-01/FI-02 (aporte) | Inyección de fallas de interfaz sintáctica y semántica — `Integracion/AssetCheckoutInterfaceTest.php` | ✅ **Ejecutados** (2026-07-05) — FI-02 detectó el defecto **INC-02**, corregido y verificado |
 | FI-03 (aporte) | Inyección de falla de resiliencia/estado (doble checkout sobre activo ya asignado) — `Integracion/AssetCheckoutInterfaceTest.php` | ✅ **Ejecutado** (2026-07-08) — rechazo con `error`, sin doble asignación; verde en SQLite y MariaDB |
-| INT-11 (aporte) | CustomFields ↔ Asset (validación dinámica) — `Integracion/CustomFieldAssetTest.php` (merge #42) | 🟡 **Ejecutado** — 5 casos verdes en SQLite; en MariaDB quedan **incompletos** (columnas dinámicas de campos personalizados) → a revisar |
+| INT-11 (aporte) | CustomFields ↔ Asset (validación dinámica) — `Integracion/CustomFieldAssetTest.php` (merge #42) | ✅ **Ejecutado** — 5 casos verdes en SQLite; en MariaDB se **omiten por diseño** (`markIncompleteIfMySQL`, convención de la propia suite de Snipe-IT: los campos personalizados alteran la tabla y no operan con MySQL+RefreshDatabase). No es defecto |
 | INT-12 (aporte) | Depreciación ↔ AssetModel ↔ Asset (valor depreciado lineal) — `Integracion/DepreciacionIntegracionTest.php` | ✅ **Ejecutado** (2026-07-08) — 3 casos verdes en SQLite y MariaDB |
 | INT-13 (aporte) | StatusLabel ↔ disponibilidad (`availableForCheckout()`, RF-08) — `Integracion/StatusLabelDisponibilidadTest.php` (merge #42) | ✅ **Ejecutado** — 8 casos verdes en SQLite y MariaDB |
+| CPF-08 (aporte) | Agotamiento de asientos de licencia — `Integracion/LicenseSeatExhaustionTest.php` | ✅ **Ejecutado** (2026-07-08) — rechazo sin sobre-asignación; verde en SQLite y MariaDB |
+| INT-07 (aporte) | FMCS: checkout cruzado entre empresas — `Integracion/FmcsCrossCompanyTest.php` | ✅ **Ejecutado** (2026-07-08) — bloquea entre empresas distintas y permite dentro de la misma; verde en SQLite y MariaDB |
+
+> **Corrida oficial de la carpeta `tests/Feature/Integracion` en MariaDB (2026-07-08):** **19 passed, 5 incomplete** (los 5 incompletos = CustomFields, omitidos por diseño en MySQL). En SQLite pasan los 24 casos. Aporte propio del grupo: FI-01/02/03, INT-07, INT-11, INT-12, INT-13, CPF-08.
 
 ---
 
