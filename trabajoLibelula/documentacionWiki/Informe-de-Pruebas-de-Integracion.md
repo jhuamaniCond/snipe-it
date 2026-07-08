@@ -43,8 +43,10 @@ Se ejecutó la **suite de integración** de Snipe-IT (`tests/Feature`, nivel int
 | INT-01…INT-10 | Flujos de integración heredados (checkout/checkin de activos, licencias, accesorios, consumibles, componentes; aceptación; FMCS; autorización; contrato API; requestable) | ✅ Ejecutados en la corrida completa |
 | INT-04 (aporte) | Asiento de licencia asignado en checkout — test del grupo | ✅ Ejecutado y **corregido** |
 | FI-01/FI-02 (aporte) | Inyección de fallas de interfaz sintáctica y semántica — `Integracion/AssetCheckoutInterfaceTest.php` | ✅ **Ejecutados** (2026-07-05) — FI-02 detectó el defecto **INC-02**, corregido y verificado |
-| FI-03 | Inyección de falla de resiliencia/estado (doble checkout) | 🕗 Diseñado en Plan §4.1 — pendiente de implementación |
-| INT-11/12/13 | Refuerzos (CustomFields, Depreciación, StatusLabels) | 🕗 Diseñados en Plan §2.4 — **pendientes de implementación** |
+| FI-03 (aporte) | Inyección de falla de resiliencia/estado (doble checkout sobre activo ya asignado) — `Integracion/AssetCheckoutInterfaceTest.php` | ✅ **Ejecutado** (2026-07-08) — rechazo con `error`, sin doble asignación; verde en SQLite y MariaDB |
+| INT-11 (aporte) | CustomFields ↔ Asset (validación dinámica) — `Integracion/CustomFieldAssetTest.php` (merge #42) | 🟡 **Ejecutado** — 5 casos verdes en SQLite; en MariaDB quedan **incompletos** (columnas dinámicas de campos personalizados) → a revisar |
+| INT-12 (aporte) | Depreciación ↔ AssetModel ↔ Asset (valor depreciado lineal) — `Integracion/DepreciacionIntegracionTest.php` | ✅ **Ejecutado** (2026-07-08) — 3 casos verdes en SQLite y MariaDB |
+| INT-13 (aporte) | StatusLabel ↔ disponibilidad (`availableForCheckout()`, RF-08) — `Integracion/StatusLabelDisponibilidadTest.php` (merge #42) | ✅ **Ejecutado** — 8 casos verdes en SQLite y MariaDB |
 
 ---
 

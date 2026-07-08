@@ -86,12 +86,13 @@
 
 ## 7. Checklist de cierre (Definition of Done del Sprint)
 
-- [ ] FI-01, FI-02, FI-03 implementados, verdes y evidenciados.
-- [ ] INT-11, INT-12, INT-13 implementados, verdes y evidenciados.
-- [ ] INT-04 consolidado; INT-07 (FMCS) y CPF-08 (agotar asientos) ejecutados.
+- [x] **FI-01, FI-02, FI-03** implementados, verdes y evidenciados (`AssetCheckoutInterfaceTest`). FI-02 halló el defecto INC-02.
+- [x] **INT-12** (Depreciación) e **INT-13** (StatusLabel) verdes en SQLite y MariaDB.
+- [~] **INT-11** (CustomFields): verde en SQLite; **incompleto en MariaDB** (columnas dinámicas) → revisar (Jhastyn).
+- [ ] **Anette:** INT-04 consolidado; INT-07 (FMCS) y CPF-08 (agotar asientos) — **pendiente**.
 - [ ] `Resultado Real` completo en el **Informe** (no en el Plan).
 - [ ] Plan + Informe publicados en **GitHub Wiki** con índice.
-- [ ] CI (GitHub Actions) de integración **en verde**.
+- [~] CI (GitHub Actions): job **MySQL** en verde; job **SQLite** falla por dialecto (RI-03) — merge #41 y #42 ya integrados.
 - [ ] GitHub **Project** actualizado y **Issues** cerrados.
 - [ ] Video de presentación grabado (2–3 con cámara).
 

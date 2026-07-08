@@ -146,4 +146,42 @@ class AssetCheckoutInterfaceTest extends TestCase
         $asset->refresh();
         $this->assertNull($asset->assigned_to, 'La API no debe asignar el activo con fechas incoherentes.');
     }
+
+    /**
+     * FI-03 — Falla de resiliencia/estado: colisión de estado.
+     * El activo YA está entregado a un usuario A; se inyecta un segundo checkout hacia
+     * un usuario B distinto (petición por lo demás válida). La frontera de control debe
+     * mantener la consistencia del sistema.
+     * Esperado: rechazo (`error` en sesión), sin doble asignación (sigue con A) y sin
+     * disparar un nuevo evento de checkout.
+     *
+     * Autor: aporte del grupo (Sprint 3, Plan §4.1). Complementa el caso heredado
+     * test_asset_not_available_for_checkout_cannot_be_checked_out verificando además que
+     * NO se produce reasignación al segundo destino.
+     */
+    public function test_fi_03_resiliencia_doble_checkout_sobre_activo_ya_asignado_es_rechazado()
+    {
+        $usuarioA = User::factory()->create();
+        $usuarioB = User::factory()->create();
+
+        // Estado previo: el activo ya está entregado al usuario A.
+        $asset = Asset::factory()->create([
+            'assigned_to' => $usuarioA->id,
+            'assigned_type' => User::class,
+        ]);
+
+        // Falla inyectada: un segundo checkout hacia el usuario B sobre un activo no disponible.
+        $this->actingAs(User::factory()->checkoutAssets()->create())
+            ->post(route('hardware.checkout.store', $asset), [
+                'checkout_to_type' => 'user',
+                'assigned_user' => $usuarioB->id,
+            ])
+            ->assertSessionHas('error');
+
+        Event::assertNotDispatched(CheckoutableCheckedOut::class);
+
+        $asset->refresh();
+        // Consistencia: sin doble asignación, el activo sigue con el usuario A.
+        $this->assertEquals($usuarioA->id, $asset->assigned_to, 'El activo no debe reasignarse a un segundo usuario.');
+    }
 }
