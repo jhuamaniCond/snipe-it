@@ -30,7 +30,7 @@ Los datos de este informe provienen de la **ejecución real** de la suite con co
 
 | Métrica | Valor |
 |---------|-------|
-| Archivos de prueba unitaria | **168** |
+| Archivos de prueba unitaria | **170** |
 | Métodos de prueba (`function test*`) | **1 021** |
 | Casos ejecutados (incl. data providers) | **1 505** |
 | Suite ejecutada | `Unit` (`./tests/Unit`) |
@@ -128,7 +128,7 @@ Las tandas que cerraron la brecha hasta el 85 % usaron patrones data-driven que 
 
 ## 7. Conclusión del informe
 
-La campaña de pruebas unitarias alcanzó el objetivo de **≥ 85 % de cobertura de líneas** sobre el núcleo de dominio (métrica Opción A): **85.14 %** (16 915 / 19 868 líneas), partiendo de un 8.49 % inicial. La suite creció hasta **168 archivos / 1 021 métodos** (1 505 casos ejecutados) y queda **en verde** tras corregir el único fallo transitorio (de entorno).
+La campaña de pruebas unitarias alcanzó el objetivo de **≥ 85 % de cobertura de líneas** sobre el núcleo de dominio (métrica Opción A): **85.14 %** (16 915 / 19 868 líneas), partiendo de un 8.49 % inicial. La suite creció hasta **170 archivos / 1 021 métodos** (1 505 casos ejecutados) y queda **en verde** tras corregir el único fallo transitorio (de entorno).
 
 Los módulos centrales presentan cobertura alta y honesta: Presenters (96.7 %), Helpers (94.8 %), Observers (91.3 %), Notifications (85.1 %) y Models (80.2 %). Los módulos con cobertura baja (`Services` SAML/SCIM, `Exceptions/Handler`, `Actions`/breadcrumbs) corresponden a código cuyo dominio de prueba natural es la suite **Feature**, no la unitaria, y están justificadamente fuera del alcance de la Opción A.
 
@@ -136,4 +136,4 @@ Con los campos de ejecución y cobertura ya consignados con valores reales, el i
 
 ---
 
-*Fin del documento — Informe de Pruebas Unitarias.*
+*Fin del documento — Informe de Pruebas Unitarias.*

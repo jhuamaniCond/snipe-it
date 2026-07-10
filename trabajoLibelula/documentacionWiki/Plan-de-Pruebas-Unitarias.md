@@ -51,7 +51,7 @@ Este documento define la estrategia, el alcance y la planificación de las **pru
 
 ## 3. Alcance: inventario unitario verificado
 
-Conteo de métodos de prueba medido directamente sobre `tests/Unit/`. **Total verificado: 45 archivos / 279 métodos.**
+Conteo de métodos de prueba medido sobre `tests/Unit/` **al inicio de la campaña** (línea base heredada). **Punto de partida: 45 archivos / 279 métodos** (cobertura de líneas 8.49 %). Tras ejecutar este plan, la suite creció a **170 archivos / 1 021 métodos** con **85.14 %** de cobertura de líneas en el núcleo de dominio; los resultados finales se consignan en el [Informe de Pruebas Unitarias](Informe-de-Pruebas-Unitarias). El inventario por módulo de esta sección corresponde al **estado base** que orientó la priorización de brechas.
 
 ### 3.1 Módulos en alcance y su estado real
 
@@ -161,13 +161,14 @@ El `phpunit.xml` mide cobertura sobre **todo `app/`** (91 controladores, transfo
 ### 7.1 Patrón AAA (Arrange–Act–Assert)
 Todo caso se estructura en preparación de datos, ejecución del método bajo prueba y verificación del resultado.
 
-### 7.2 Técnicas de caja negra aplicadas
+### 7.2 Técnicas de caja blanca aplicadas
 
 | Técnica | Aplicación representativa |
 |---------|----------------------------|
 | Partición de equivalencia | `percentRemaining()`: sin stock / parcial / completo |
 | Análisis de valores límite | 0 %, 50 %, 100 % exactos; `qty = 0` |
-| Tabla de decisión y transicion de estados| `getStatuslabelType()` (combinaciones pending/archived/deployable) |
+| Tabla de decisión | `getStatuslabelType()` (combinaciones pending/archived/deployable) |
+| Cobertura de ramas | `isDeletable()` con y sin items |
 | Manejo de nulos | `totalCostSum()` con `purchase_cost = null` |
 
 ### 7.3 Aislamiento de base de datos

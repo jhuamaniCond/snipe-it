@@ -4,7 +4,7 @@
 **Producto bajo prueba:** [Snipe-IT](https://github.com/grokability/snipe-it) — sistema libre de gestión de activos y licencias de TI
 **Fork de trabajo:** [`jhuamaniCond/snipe-it`](https://github.com/jhuamaniCond/snipe-it)
 **Estándar de referencia:** ISO/IEC/IEEE 29119 (Parte 2: Procesos; Parte 3: Documentación)
-**Última actualización del índice:** 2026-06-12
+**Última actualización del índice:** 2026-07-10
 
 ---
 
@@ -31,10 +31,14 @@ Toda la información publicada está **verificada contra el repositorio real**. 
 - [Matriz de Trazabilidad](Matriz-de-Trazabilidad)
 - [Cobertura y Estado Real del Proyecto](Cobertura-y-Estado-del-Proyecto)
 
-### Hito 3 — Sprint 3-4 (sistema, aceptación y cierre)
+### Hito 3 — Sprint 3-4 (integración, sistema, aceptación y cierre)
+- [Informe de Pruebas de Integración](Informe-de-Pruebas-de-Integracion)
 - [Plan de Pruebas de Sistema](Plan-de-Pruebas-de-Sistema)
+- [Informe de Pruebas de Sistema](Informe-de-Pruebas-de-Sistema)
 - [Plan de Pruebas de Aceptación](Plan-de-Pruebas-de-Aceptacion)
+- [Informe de Pruebas de Aceptación](Informe-de-Pruebas-de-Aceptacion)
 - [Conclusiones y Recomendaciones](Conclusiones-y-Recomendaciones)
+- [Informe Final — Artículo formato IEEE](Informe-Final-Paper)
 
 ---
 
@@ -53,8 +57,8 @@ Los siguientes valores fueron medidos directamente sobre el árbol de código de
 | Policies de autorización | 22 |
 | Factories de datos de prueba | 29 |
 | Migraciones de base de datos | 444 |
-| Pruebas unitarias | 45 archivos · 279 métodos de prueba |
-| Pruebas de integración (Feature) | 292 archivos · 1624 métodos de prueba |
+| Pruebas unitarias | 170 archivos · 1 021 métodos de prueba (cobertura de líneas **85.14 %** en el núcleo de dominio) |
+| Pruebas de integración (Feature) | 302 archivos · 1 648 métodos de prueba (296 heredados + 6 archivos / 24 casos de aporte propio) |
 | Workflows de CI/CD (GitHub Actions) | 11 |
 
 > Nota sobre la licencia: el enunciado del curso exige "Licencia MIT/GPL verificada". Snipe-IT se distribuye bajo **AGPL-3.0-or-later**, una licencia de la familia GPL con copyleft de red, que permite fork, modificación y uso libre con fines académicos. El criterio del curso queda satisfecho.
@@ -64,7 +68,7 @@ Los siguientes valores fueron medidos directamente sobre el árbol de código de
 ## 4. Convenciones de la documentación
 
 - **Trazabilidad:** todo caso de prueba se vincula a un requisito, un módulo, una evidencia y un resultado (ver [Matriz de Trazabilidad](Matriz-de-Trazabilidad)).
-- **Campos pendientes de CI:** los valores que requieren ejecución real (porcentaje de cobertura, número de pruebas en verde/rojo) se marcan como `⟦PENDIENTE-CI⟧` y se completan a partir del artefacto `clover.xml` generado por el workflow de cobertura. **No se publican valores estimados como si fueran reales.**
+- **Campos pendientes de CI:** los valores que requieren ejecución real (porcentaje de cobertura, número de pruebas en verde/rojo) se marcan como `⟦PENDIENTE-CI⟧` y se completan a partir del artefacto `clover.xml` generado por el workflow de cobertura. La **cobertura unitaria ya fue medida** (**85.14 %** de líneas en el núcleo de dominio; artefacto `trabajoLibelula/clover.xml`, ver [Informe de Pruebas Unitarias](Informe-de-Pruebas-Unitarias)). **No se publican valores estimados como si fueran reales.**
 - **Idioma:** español formal técnico-académico.
 - **Nomenclatura de páginas:** nombres con guiones, compatibles con GitHub Wiki.
 
@@ -81,5 +85,3 @@ Los siguientes valores fueron medidos directamente sobre el árbol de código de
 | GitHub Pages | Presentación pública del producto y demo de staging |
 
 ---
-
-*Documento índice — mantener sincronizado al añadir o renombrar páginas.*

@@ -61,10 +61,12 @@ database/
 ├── factories/         29 factories de datos de prueba
 └── migrations/        444 migraciones
 tests/
-├── Unit/              45 archivos / 279 métodos
-└── Feature/           292 archivos / 1624 métodos
+├── Unit/              170 archivos / 1 021 métodos
+└── Feature/           302 archivos / 1 648 métodos
 .github/workflows/     11 pipelines de CI/CD
 ```
+
+> **Nota sobre el conteo de pruebas:** el producto se seleccionó con una base de pruebas heredada (≈216 métodos unitarios y ≈1 509 de integración). Las cifras del árbol reflejan el **estado actual del fork tras el trabajo del grupo**: la suite unitaria se amplió durante la campaña de cobertura (8.49 % → **85.14 %**, ver [Informe de Pruebas Unitarias](Informe-de-Pruebas-Unitarias)) y la de integración incorpora **24 casos de aporte propio** en `tests/Feature/Integracion/` (ver [Informe de Pruebas de Integración](Informe-de-Pruebas-de-Integracion)).
 
 **Patrones arquitectónicos relevantes para las pruebas:**
 - **Transformers obligatorios:** los controladores de API nunca devuelven atributos crudos; serializan mediante una clase Transformer.
@@ -112,4 +114,4 @@ La presentación del producto en este hito establece la **línea base** sobre la
 
 ---
 
-*Fin del documento — Hito 1.*
+*Fin del documento — Hito 1.*

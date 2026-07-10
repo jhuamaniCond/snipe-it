@@ -23,8 +23,8 @@ Se cubrieron los cuatro niveles de prueba previstos por la norma ISO/IEC/IEEE 29
 
 | Logro | Evidencia verificada |
 |-------|----------------------|
-| Base de pruebas unitarias consolidada | 45 archivos / 279 métodos en `tests/Unit/` |
-| Amplia suite de integración existente | 292 archivos / 1624 métodos en `tests/Feature/` |
+| Suite unitaria ampliada por el grupo (campaña de cobertura 8.49 % → **85.14 %**) | 170 archivos / 1 021 métodos en `tests/Unit/` |
+| Suite de integración (heredada + aporte propio) | 302 archivos / 1 648 métodos en `tests/Feature/` (296 heredados + 6 archivos / 24 casos propios) |
 | Pipeline de CI/CD operativo | 11 workflows, incluido cobertura con PCOV |
 | Cobertura automatizada con artefactos | `tests-unit-coverage.yml` → Clover + HTML + JUnit |
 | Compatibilidad multimotor en CI | Workflows SQLite, MySQL y PostgreSQL |
@@ -51,7 +51,8 @@ La configuración por defecto mide cobertura sobre **todo `app/`**, lo que subes
 |-----------|-----------|----------------------|
 | Alta | Ampliar unitarias de AssetModel, Consumable, License/Seat | Testers asignados |
 | Alta | Cubrir `getStatuslabelType()`/`getStatuslabelTypesForDB()` | Revisor |
-| Alta | Ejecutar workflow de cobertura y transcribir valores `⟦PENDIENTE-CI⟧` | CI/CD |
+| ✅ Hecho | Cobertura unitaria medida (PCOV → `clover.xml`): **85.14 %** de líneas en el núcleo de dominio, transcrita al [Informe de Pruebas Unitarias](Informe-de-Pruebas-Unitarias) y a [Cobertura y Estado Real](Cobertura-y-Estado-del-Proyecto) | CI/CD |
+| Alta | Estabilizar la corrida E2E (Dusk) en CI y completar NF-SEC-02 / NF-PERF-02 / NF-REL-01 | Sistema |
 | Media | Ejecutar casos funcionales manuales (CPF) en QA | Equipo QA |
 | Media | Ejecutar pruebas de integración (Hito 3) | Equipo |
 | Baja | Registrar deuda técnica de `percentRemaining()` como Issue | QA Lead |
@@ -61,7 +62,7 @@ La configuración por defecto mide cobertura sobre **todo `app/`**, lo que subes
 ## 5. Recomendaciones
 
 ### 5.1 Sobre el proceso de pruebas
-1. **Cerrar el ciclo de cobertura:** ejecutar el pipeline y completar todos los campos `⟦PENDIENTE-CI⟧`/`⟦PENDIENTE-QA⟧` con valores reales antes de la sustentación.
+1. **Cerrar el ciclo de cobertura:** la cobertura unitaria ya se midió (**85.14 %**, `clover.xml`); resta consolidar en verde la corrida E2E (Dusk) en CI y completar las pruebas no funcionales pendientes antes de la sustentación.
 2. **Gate de cobertura en CI:** hacer fallar el job si la cobertura de los modelos en alcance baja del 80 %.
 3. **Priorizar por riesgo:** atender primero los módulos de baja cobertura y alta criticidad (AssetModel, Consumable).
 

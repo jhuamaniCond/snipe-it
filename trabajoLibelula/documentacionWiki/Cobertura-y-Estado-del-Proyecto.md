@@ -25,8 +25,8 @@ Valores medidos directamente sobre el árbol de código (no estimados):
 | Policies | 22 |
 | Factories | 29 |
 | Migraciones | 444 |
-| **Pruebas unitarias** | **45 archivos / 279 métodos** |
-| **Pruebas de integración (Feature)** | **292 archivos / 1624 métodos** |
+| **Pruebas unitarias** | **170 archivos / 1 021 métodos** (cobertura de líneas 85.14 % en el núcleo de dominio) |
+| **Pruebas de integración (Feature)** | **302 archivos / 1 648 métodos** (296 heredados + 6 archivos / 24 casos de aporte propio) |
 | Workflows CI/CD | 11 |
 
 ---
@@ -40,8 +40,8 @@ El archivo `phpunit.xml` define el ámbito de cobertura como **todo `app/`**:
 ```
 En consecuencia, ejecutar **solo** la suite `Unit` y medir contra **todo `app/`** (que incluye 91 controladores, transformers y helpers no cubiertos por unitarias) produce un **porcentaje global bajo** que **no representa** la calidad de las pruebas unitarias de la capa de modelos.
 
-### 2.2 Limitación del entorno local actual
-Al momento de redactar, el entorno local **no permite medir la cobertura**: no hay binario de PHP en el PATH, las dependencias (`vendor/`) no están instaladas y no existe un reporte de cobertura previo en el repositorio. **Por integridad, no se publica ningún porcentaje estimado.**
+### 2.2 Medición de cobertura ejecutada
+En la primera versión de este documento (Hito 2, 2026-06-12) el entorno local **no permitía medir la cobertura** (sin binario de PHP en el PATH ni `vendor/` instalado) y, por integridad, no se publicó ningún porcentaje estimado. **Posteriormente, durante la campaña de cobertura, la medición sí se ejecutó** con PHPUnit 11.5 + PCOV (`php -d memory_limit=-1 vendor/bin/phpunit --testsuite Unit --coverage-clover clover.xml`), generando el artefacto verificable **`trabajoLibelula/clover.xml`**. Los valores reales se consignan en el [Informe de Pruebas Unitarias](Informe-de-Pruebas-Unitarias) y se transcriben en §3.
 
 ### 2.3 Fuente oficial de cobertura
 La cobertura real se obtiene del workflow **`tests-unit-coverage.yml`**, que genera `clover.xml` y un reporte HTML como artefactos. Ver [Pipeline CI/CD](Pipeline-CI-CD) §3.
@@ -50,20 +50,23 @@ La cobertura real se obtiene del workflow **`tests-unit-coverage.yml`**, que gen
 
 ## 3. Métricas oficiales y su estado
 
-| Métrica | Definición | Objetivo | Valor real |
-|---------|------------|----------|------------|
-| Cobertura de modelos en alcance | Líneas cubiertas en `app/Models/` de los subsistemas núcleo | ≥ 80 % | `⟦PENDIENTE-CI⟧` |
-| Cobertura global `app/` | Informativa, no es objetivo | — | `⟦PENDIENTE-CI⟧` |
-| Pruebas unitarias en verde | PASS / total | 100 % | `⟦PENDIENTE-CI⟧` |
-| Tiempo de ejecución (Unit) | Duración de la suite | < 60 s | `⟦PENDIENTE-CI⟧` |
+| Métrica | Definición | Objetivo | Valor real (medido) |
+|---------|------------|----------|---------------------|
+| Cobertura de líneas — núcleo de dominio (Opción A) | Líneas cubiertas en el alcance unitario de `phpunit.xml` | ≥ 80 % | **85.14 %** (16 915 / 19 868) ✅ |
+| Cobertura de modelos | Líneas cubiertas en `app/Models/` | ≥ 80 % | **80.2 %** (5 065 / 6 315) ✅ |
+| Cobertura global `app/` (con controladores) | Informativa, no es objetivo | — | Fuera del alcance unitario (dominio de la suite Feature) |
+| Pruebas unitarias en verde | PASS / total | 100 % | **1 504 / 1 505 PASS** (100 % tras corregir 1 fallo transitorio de entorno) ✅ |
+| Tiempo de ejecución (Unit) | Duración de la suite | < 60 s | **~2 min** con instrumentación PCOV |
 
-> Procedimiento para completar: ejecutar el workflow de cobertura → descargar artefacto → transcribir el porcentaje de `app/Models/` (modelos en alcance) y los totales de `junit.xml`.
+> Fuente: artefacto `trabajoLibelula/clover.xml` (`statements="19868" coveredstatements="16915"`) y el [Informe de Pruebas Unitarias](Informe-de-Pruebas-Unitarias) §2–§4. Los valores dejaron de estar `⟦PENDIENTE-CI⟧` al ejecutarse la medición real.
 
 ---
 
-## 4. Estado por módulo (cobertura de pruebas, inventario verificado)
+## 4. Estado por módulo (inventario de **línea base**, Hito 2)
 
-| Módulo | # Tests unitarios | Estado de cobertura unitaria | Acción Hito 2 |
+> Las cifras de esta tabla corresponden al **inventario base** que orientó la priorización de brechas. Tras la campaña de cobertura, la suite unitaria alcanzó **170 archivos / 1 021 métodos** y **85.14 %** de líneas (ver §3 e [Informe de Pruebas Unitarias](Informe-de-Pruebas-Unitarias)).
+
+| Módulo | # Tests unitarios (base) | Estado de cobertura unitaria | Acción Hito 2 |
 |--------|-------------------|------------------------------|----------------|
 | Depreciable | 30 | ✅ Alta | Documentar |
 | User | 25 | 🟢 Buena | Ampliar brechas |
@@ -98,8 +101,8 @@ La cobertura real se obtiene del workflow **`tests-unit-coverage.yml`**, que gen
 
 ## 6. Conclusión del estado
 
-El proyecto presenta una **base de pruebas robusta y verificable** (279 unitarias + 1624 de integración) y un **pipeline de CI/CD operativo con cobertura automatizada**. El trabajo pendiente del Hito 2 es: (1) cerrar las brechas unitarias prioritarias (AssetModel, Consumable, License, Statuslabel); (2) ejecutar el workflow de cobertura y transcribir los valores reales a los campos `⟦PENDIENTE-CI⟧`; (3) ejecutar las pruebas funcionales manuales en QA.
+El proyecto presenta una **base de pruebas robusta y verificable** (1 021 unitarias + 1 648 de integración) y un **pipeline de CI/CD operativo con cobertura automatizada**. Las **pruebas funcionales manuales en QA ya se ejecutaron** (sesiones del 2026-06-21 al 2026-06-24): 60 casos Conforme, 1 No conforme (CPF-12.2 → INC-RF09-001) y 0 Bloqueado, según el [Informe de Casos de Pruebas Funcionales](Informe-de-Casos-de-Pruebas-Funcionales). Las brechas unitarias prioritarias (AssetModel, Consumable, License, Statuslabel) se cerraron en la campaña de cobertura y **la medición ya se ejecutó** (85.14 %, `clover.xml`), por lo que los campos `⟦PENDIENTE-CI⟧` de este documento quedaron completados con valores reales. El trabajo restante corresponde al Hito 3 (estabilizar la corrida E2E y completar las pruebas no funcionales pendientes).
 
 ---
 
-*Fin del documento — Cobertura y Estado Real del Proyecto.*
+*Fin del documento — Cobertura y Estado Real del Proyecto.*

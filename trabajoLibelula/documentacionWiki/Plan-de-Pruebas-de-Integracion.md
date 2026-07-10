@@ -25,7 +25,7 @@ Las pruebas de integración verifican que los **módulos del sistema interactúa
 2. Verificar las interfaces HTTP (rutas web y endpoints de API REST) y su contrato de respuesta.
 3. Comprobar el respeto de las **políticas de autorización** y el **scoping multiempresa (FMCS)**.
 
-> **Hallazgo verificado:** el proyecto original **ya incluye** una amplia suite de integración: **292 archivos / 1509 métodos** en `tests/Feature/` (medición 2026-07-04), organizados por subsistema. Este plan **aprovecha y documenta** esa base heredada e identifica **lo que falta** (áreas débiles y fallas de interfaz) como aporte del grupo; no parte de cero. Ver la **Matriz heredado vs aporte (§2.4)**.
+> **Hallazgo verificado:** el proyecto original **ya incluye** una amplia suite de integración: **296 archivos / 1509 métodos** heredados en `tests/Feature/` (línea base), organizados por subsistema. Este plan **aprovecha y documenta** esa base heredada e identifica **lo que falta** (áreas débiles y fallas de interfaz) como aporte del grupo; no parte de cero. Ver la **Matriz heredado vs aporte (§2.4)**.
 
 ---
 

@@ -34,7 +34,7 @@ Se ejecutó la **suite de integración** de Snipe-IT (`tests/Feature`, nivel int
 
 - **Plan de referencia:** [Plan de Pruebas de Integración](Plan-de-Pruebas-de-Integracion) v1.2.
 - **Trazabilidad:** los flujos INT-XX se vinculan a los RF-XX y CPF-XX en la [Matriz de Trazabilidad](Matriz-de-Trazabilidad).
-- **Suite base heredada:** el proyecto original ya incluye **292 archivos / 1509 métodos** en `tests/Feature/` (nivel integración). Este Informe documenta su **ejecución**, la **clasificación de fallos** y el **aporte del grupo**.
+- **Suite base heredada:** el proyecto original ya incluía **296 archivos / 1509 métodos** en `tests/Feature/` (línea base, nivel integración). Con el crecimiento de la suite y el **aporte propio del grupo** (6 archivos / 24 casos en `tests/Feature/Integracion/`), el árbol actual suma **302 archivos / 1 648 métodos**. Este Informe documenta la **ejecución** de la suite, la **clasificación de fallos** y el **aporte del grupo**.
 
 ---
 
@@ -127,7 +127,7 @@ El laboratorio del docente usa **Supertest/Postman (Node)**, pero permite elegir
 
 | | Heredado (proyecto original) | Aporte del grupo (Hito 3) |
 |--|------------------------------|---------------------------|
-| Flujos | INT-01…INT-10 (292 archivos / 1509 métodos) | Ejecución + documentación + entorno Docker reproducible |
+| Flujos | INT-01…INT-10 (296 archivos / 1509 métodos heredados) | Ejecución + documentación + entorno Docker reproducible |
 | Tests propios | — | **Suite `tests/Feature/Integracion/` completa (24 casos):** FI-01/02/03, CPF-08, INT-07, INT-11, INT-12, INT-13 + corrección del test heredado de asientos de licencia |
 | Análisis | — | Clasificación de 4 fallos (3 dialecto + 1 defecto de prueba) · **1 defecto del sistema encontrado y corregido (INC-02)** |
 | Cobertura de aporte | — | ✅ **Completo** — todos los flujos nuevos diseñados en el Plan fueron implementados y ejecutados |
@@ -227,6 +227,22 @@ El error "Allowed memory size exhausted" al correr toda la suite se debía al `m
 - `HITO-3/Integracion/Evidencias/INVENTARIO-INTEGRACION-tests-Feature.md` — inventario de la suite heredada.
 - `HITO-3/Integracion/docker-compose.test.yml`, `Dockerfile.test`, `README-ENTORNO-DOCKER.md` — entorno reproducible.
 - `HITO-3/Integracion/Evidencias/RESULTADO-FI01-FI02-InyeccionFallas.md` — resultados FI-01/FI-02, reporte INC-02 y fix (con logs y capturas en `Evidencias/FI-01-FI-02/`).
+
+## Anexo D — Capturas de ejecución FI-01 / FI-02 (inyección de fallas de interfaz)
+
+**Corrida ANTES del fix — CP-FI-02 revela el defecto INC-02 (FI-01 en verde, FI-02 en rojo):**
+
+![Corrida antes del fix: FI-02 falla (INC-02)](capturas/FI-02-INC02-antes-del-fix.png)
+
+**Corrida DESPUÉS del fix — 4/4 en verde (18 aserciones):**
+
+![Corrida después del fix: todo verde](capturas/FI-01-FI-02-verdes-despues-del-fix.png)
+
+**Ejecución por caso:**
+
+![Ejecución de los casos FI-01](capturas/FI-01.png)
+
+![Ejecución de los casos FI-02](capturas/FI-02.png)
 
 ---
 

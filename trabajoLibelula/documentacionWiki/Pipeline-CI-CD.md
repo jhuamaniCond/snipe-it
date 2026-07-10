@@ -67,11 +67,11 @@ El repositorio cuenta con **11 workflows** en `.github/workflows/`, verificados 
 ### 3.3 Artefactos generados (fuente de evidencia)
 | Artefacto | Contenido | Uso en la documentación |
 |-----------|-----------|--------------------------|
-| `clover.xml` | Cobertura de líneas | Completar [Cobertura y Estado Real](Cobertura-y-Estado-del-Proyecto) |
+| `clover.xml` | Cobertura de líneas | Transcrito en [Cobertura y Estado Real](Cobertura-y-Estado-del-Proyecto) (**85.14 %**) |
 | `html/` | Reporte navegable | Evidencia visual |
-| `junit.xml` | Resultados PASS/FAIL | Completar [Informe de Pruebas Unitarias](Informe-de-Pruebas-Unitarias) |
+| `junit.xml` | Resultados PASS/FAIL | Transcrito en [Informe de Pruebas Unitarias](Informe-de-Pruebas-Unitarias) (1 504/1 505 PASS) |
 
-> **Estos artefactos son la fuente oficial y verificable** de los porcentajes de cobertura y los resultados de ejecución. Los documentos de esta Wiki que dependen de ellos los marcan como `⟦PENDIENTE-CI⟧` hasta su transcripción.
+> **Estos artefactos son la fuente oficial y verificable** de los porcentajes de cobertura y los resultados de ejecución. La medición de cobertura unitaria **ya se ejecutó y transcribió** (artefacto `trabajoLibelula/clover.xml`); los valores que aún requieren una corrida en CI (p. ej. la suite E2E) se marcan como `⟦PENDIENTE-CI⟧` hasta su transcripción.
 
 ---
 
@@ -110,4 +110,4 @@ Los artefactos de este pipeline son la evidencia que cierra el [Informe de Prueb
 
 ---
 
-*Fin del documento — Pipeline CI/CD.*
+*Fin del documento — Pipeline CI/CD.*
