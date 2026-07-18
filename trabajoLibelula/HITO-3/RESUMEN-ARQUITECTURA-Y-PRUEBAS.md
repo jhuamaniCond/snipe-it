@@ -140,12 +140,32 @@ En la terminología de Laravel son *"Feature tests"*. Patrón real (ej. `Accesso
 | Presentación/defensa | Todas las herramientas: Projects, Issues, Actions, Wiki, Pages + demo sobre la URL QA | 🕗 |
 | Wiki actualizada | Publicar los Planes/Informes v. finales de Sistema (y Aceptación cuando exista) | 🕗 |
 
-### 7.6 Ruta crítica sugerida (de aquí al 16/17)
+### 7.6 Requisitos FINALES de la presentación (indicación del docente, 2026-07-09)
 
-1. **Aceptación** (único nivel sin documentos): Plan+Informe UAT reutilizando los CPF — esfuerzo bajo, cierra el enunciado del hito.
-2. **Desplegar Railway** (URL QA) → ejecutar allí la sesión UAT y re-medir NF → evidencias.
-3. **Estabilizar `e2e-dusk.yml`** (o documentarlo como limitación con transparencia, ya redactada en el Informe de Sistema).
-4. **Artículo IEEE** (todo lo anterior es su materia prima) + video + wiki.
+> Esta lista **actualiza las prioridades** de §7.1–7.5:
+
+| Requisito obligatorio | Estado nuestro |
+|---|---|
+| Unitarias, funcionales, **cobertura ≥ 85 %** | ✅ 85.14 % |
+| Integración terminada (**APIs críticas**) | ✅ 24 casos propios + suite `*/Api/*` heredada (112 archivos) |
+| Sistema con **SOLO DOS atributos** no funcionales | ⚠️ Teníamos 3 → **oficiales: Seguridad + Desempeño** (con evidencia real 4/4); Fiabilidad queda como verificación complementaria ya ejecutada |
+| Automatización con **GitHub Actions** | ✅ (tests 3 BD + coverage + CodeQL) |
+| **Artículo Técnico IEEE** (no de investigación), 6–8 págs, sin errores | ❌ **PRIORIDAD #1** — los `.md` actualizados son la materia prima |
+
+| Plus (opcional) | Estado nuestro |
+|---|---|
+| Artículo + sustentación en inglés | ❌ decisión del grupo |
+| **E2E (Selenium/Cypress/Playwright) — "ya no es prioridad"** | 🟡 **Plus parcial ya logrado**: Dusk+Selenium implementado (tests/Browser, compose E2E, workflow CI); corrida verde no exigible |
+| SonarQube unido al pipeline | ❌ opcional (evaluar si sobra tiempo) |
+
+**Notas de alcance:** (1) **Aceptación ya no figura** en los requisitos finales — se retira de la ruta crítica (los CPF manuales del Hito 2 cubren la validación funcional). (2) El E2E deja de ser bloqueante: lo implementado se presenta como **plus**, con su estado transparente.
+
+### 7.7 Ruta crítica FINAL (de aquí al 16/17)
+
+1. **Artículo IEEE** (6–8 págs, formato correcto) — prioridad absoluta; fuente: los Informes ya actualizados.
+2. **Ajustar Plan/Informe de Sistema a 2 atributos oficiales** (Seguridad + Desempeño) — hecho en v2.1/v1.3.
+3. *(Refuerzo recomendado)* **K6** para el atributo Desempeño (el docente lo mencionó en la bibliografía) sobre la URL/Docker.
+4. Wiki actualizada + video + (opcional) inglés / SonarQube si sobra tiempo.
 
 ---
 

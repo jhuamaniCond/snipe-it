@@ -5,7 +5,7 @@
 | Campo | Detalle |
 |-------|---------|
 | **Documento** | Plan de Pruebas de Sistema (E2E) — Snipe-IT |
-| **Versión** | 2.0 (refina la v1.0 hacia E2E automatizado + no-funcional basado en riesgo) |
+| **Versión** | 2.1 (v2.0 refinó a E2E + no-funcional por riesgo; v2.1 fija **2 atributos oficiales**: Seguridad y Desempeño) |
 | **Hito / Sprint** | Hito 3 (Sprint 3–4) |
 | **Nivel de prueba** | Sistema (E2E, caja negra sobre el sistema desplegado) |
 | **Herramienta E2E** | **Laravel Dusk** (navegador real / ChromeDriver) — equivalente en el stack a Cypress/Playwright |
@@ -80,7 +80,9 @@ E2E valida lo que los niveles inferiores no pueden: **render de la UI, JavaScrip
 
 ## 6. Selección de pruebas NO funcionales y su fundamentación
 
-> **Pregunta:** ¿cuántos atributos no funcionales probar? **Respuesta: 3 características** — **Seguridad, Rendimiento y Fiabilidad** — seleccionadas por **riesgo** (ISO 29119 no exige probarlas todas: se prioriza por *probabilidad × impacto*), sobre el modelo de calidad **ISO/IEC 25010** y por su **observabilidad a nivel de sistema**.
+> **Actualización v2.1 (indicación del docente para la presentación final):** el nivel de sistema debe aplicar **solo DOS atributos**. Se declaran como **atributos OFICIALES: Seguridad y Desempeño (rendimiento)** — los dos de mayor riesgo en la matriz §6.1 y los que cuentan con **evidencia real ejecutada**. La **Fiabilidad**, planificada originalmente como tercera característica, se mantiene únicamente como *verificación complementaria ya ejecutada* (NF-REL-02), fuera del alcance oficial.
+
+> Fundamento de la selección: por **riesgo** (ISO 29119 no exige probar todos los atributos: se prioriza por *probabilidad × impacto*), sobre el modelo de calidad **ISO/IEC 25010** y por su **observabilidad a nivel de sistema**.
 
 ### 6.1 Matriz de riesgo (ISO 25010 × riesgo)
 
@@ -193,6 +195,7 @@ class CheckoutAssetE2ETest extends DuskTestCase
 |---------|-------|---------|
 | 1.0 | 2026-06-12 | Plan inicial (categorías SYS-01…SYS-07). |
 | 2.0 | 2026-07-08 | Refinado a **E2E automatizado (Laravel Dusk)**; selección **no-funcional basada en riesgo** (ISO 25010): 3 características (Seguridad, Rendimiento, Fiabilidad) fundamentadas; escenarios E2E-01…06 y casos NF-*; entorno staging Docker + CI. |
+| 2.1 | 2026-07-09 | Ajuste a la indicación final del docente: **dos atributos oficiales** (Seguridad + Desempeño); Fiabilidad pasa a verificación complementaria. El E2E deja de ser prioritario (plus opcional según el docente); se recomienda **K6** para el atributo Desempeño. |
 
 ---
 

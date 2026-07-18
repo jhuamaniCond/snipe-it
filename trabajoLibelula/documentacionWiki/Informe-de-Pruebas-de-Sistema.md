@@ -5,7 +5,7 @@
 | Campo | Detalle |
 |-------|---------|
 | **Documento** | Informe de Pruebas de Sistema (E2E) — Snipe-IT |
-| **Versión** | 1.2 |
+| **Versión** | 1.3 |
 | **Hito / Sprint** | Hito 3 (Sprint 3–4) |
 | **Nivel de prueba** | Sistema (E2E + no funcional, caja negra sobre el sistema desplegado) |
 | **Herramienta E2E** | Laravel Dusk (recorridos por navegador) · `curl` (mediciones no funcionales HTTP) |
@@ -26,6 +26,8 @@ Se verificó el sistema **desplegado** de Snipe-IT a nivel de sistema. Los atrib
 Los **recorridos E2E funcionales por navegador** (E2E-01…E2E-06) quedan **diseñados y listos para ejecución con Laravel Dusk** (requiere Dusk + ChromeDriver instalados); es el paso de ejecución siguiente.
 
 **Veredicto parcial:** los controles de sistema no funcionales de mayor riesgo (seguridad, rendimiento, fiabilidad) se comportan según lo esperado; no se hallaron defectos en las verificaciones ejecutadas.
+
+**Actualización v1.3 — alcance final (indicación del docente):** para la presentación final, el nivel de sistema aplica **solo DOS atributos oficiales: Seguridad y Desempeño (rendimiento)** — ambos con evidencia real PASS en este informe. La **Fiabilidad** (NF-REL-02, también PASS) se reporta como *verificación complementaria* fuera del alcance oficial. Asimismo, el docente indicó que la **automatización E2E "ya no es prioridad"** (plus opcional): lo implementado (Dusk + Selenium + workflow CI) se presenta como **plus parcial** con su estado transparente (§5.4), sin obligación de corrida verde. Para reforzar el atributo Desempeño se recomienda **K6** (carga con usuarios virtuales y umbrales p95), mencionado en la bibliografía del curso.
 
 ---
 
@@ -172,5 +174,6 @@ Se implementó la automatización E2E completa con **Laravel Dusk**:
 | 1.0 | 2026-07-08 | Informe inicial: ejecución de no funcionales HTTP (NF-SEC/PERF/REL, 4/4 PASS con datos reales sobre la app desplegada); E2E funcionales diseñados y pendientes de ejecución con Dusk; métricas y criterios de salida. |
 | 1.1 | 2026-07-08 | Automatización E2E implementada (Laravel Dusk) + infraestructura Docker (Selenium/Chrome) + workflow CI `e2e-dusk.yml`. §5.4 con el **estado de ejecución transparente**: stack y Dusk verificados; **corrida verde pendiente en CI Linux** (el bind-mount de Docker en Windows impide la corrida local). Sin inflar resultados. |
 | 1.2 | 2026-07-08 | Corregido tras el resultado real: la **primera corrida E2E en CI falló**; se marca como **"aún no verde / en estabilización"** en §3, §5.4, §8 y §9 (sin reportar E2E como aprobados). Las pruebas no funcionales de sistema permanecen ejecutadas y verdes (4/4). |
+| 1.3 | 2026-07-09 | Alcance final por indicación del docente: **dos atributos oficiales** (Seguridad + Desempeño, ambos PASS); Fiabilidad como verificación complementaria. **E2E reclasificado como plus opcional** ("ya no es prioridad"). Recomendación de **K6** para Desempeño. |
 
 *Fin del documento — Informe de Pruebas de Sistema (E2E).*
