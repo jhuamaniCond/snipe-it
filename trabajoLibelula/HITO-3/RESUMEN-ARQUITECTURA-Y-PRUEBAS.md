@@ -1,7 +1,7 @@
 # Resumen de arquitectura, tamaño y tipos de prueba — Snipe-IT
 
-> Documento base para arrancar las **pruebas de integración** del Hito 3.
-> Métricas medidas directamente sobre el código (excluye `trabajoLibelula/`, `vendor/` y los assets compilados de `public/`). Fecha de medición: 2026-07-04.
+> Documento base para las pruebas del Hito 3 (integración, sistema y aceptación).
+> Métricas medidas directamente sobre el código (excluye `trabajoLibelula/`, `docs/`, `vendor/` y los assets compilados de `public/`). Medición original: 2026-07-04 · **Re-verificado: 2026-07-09 (v2)** — todas las cifras confirmadas; solo variaron las de `tests/` por el **aporte propio del grupo** (ver §5).
 > **Líneas físicas** (`wc -l`, incluyen blancos y comentarios); el SLOC "puro" sería ~30–40 % menor.
 
 ---
@@ -13,7 +13,7 @@
 | **Backend (lógica PHP)** | `app/` (87 126) + `routes/` (3 054) + `database/` (4 965) + `config/` (4 401) | **99 546** | ~99.5 |
 | **Frontend / presentación** | `resources/views/` Blade (39 069) + `resources/assets/js` (4 246) + `resources/assets/less` (4 214) | **47 529** | ~47.5 |
 | **Producción total (sin tests)** | — | **~147 075** | **~147 KLOC** |
-| Código de pruebas | `tests/` | 53 566 | ~53.6 |
+| Código de pruebas | `tests/` | 54 714 *(53 566 heredadas + ~1 148 del grupo)* | ~54.7 |
 
 - Producción ≈ **147 KLOC físicas** (≈ 90–100 KLOC de SLOC efectivo).
 - Reparto: **backend ~2/3**, **presentación ~1/3**.
@@ -53,7 +53,7 @@ Subsistemas de soporte: Dashboard · Setup · Auth (login / 2FA / LDAP / SAML) �
 ## 4. ¿Las pruebas unitarias y la cobertura son de back o de front?
 
 **Del backend (PHP).** Se ejecutan con **PHPUnit + PCOV**; el `<source>` de `phpunit.xml` apunta a `app/`.
-El **frontend no tiene pruebas automatizadas**: no hay Jest, Vitest, Cypress, Playwright ni Dusk (verificado en `package.json` y `composer.json`). Las vistas Blade solo se ejercitan **indirectamente** cuando un Feature test renderiza una página, pero la cobertura mide **código PHP**.
+El **frontend no tenía pruebas automatizadas en el proyecto original**: no hay Jest, Vitest, Cypress ni Playwright (verificado en `package.json`). **Actualización (v2):** el **grupo añadió Laravel Dusk** en el Hito 3 (`composer.json` dev + `tests/Browser/`, 2 archivos E2E) — pruebas de **nivel sistema por navegador real**, no de "frontend aislado". Las vistas Blade se ejercitan **indirectamente** cuando un Feature test renderiza una página, pero la **cobertura sigue midiendo código PHP**.
 
 ---
 
@@ -62,7 +62,8 @@ El **frontend no tiene pruebas automatizadas**: no hay Jest, Vitest, Cypress, Pl
 | Carpeta | # archivos `*Test.php` | Qué son |
 |---|---:|---|
 | `tests/Unit` | **168** | **Pruebas unitarias** puras: aíslan clases/métodos (Models, Presenters, Transformers, Rules, Helpers, Policies). |
-| `tests/Feature` | **292** | **Pruebas de integración / funcionales** a nivel de aplicación (HTTP). |
+| `tests/Feature` | **298** *(292 heredadas + **6 del grupo** en `Integracion/`, 24 métodos: FI-01/02/03, CPF-08, INT-07/11/12/13)* | **Pruebas de integración / funcionales** a nivel de aplicación (HTTP). Total: 1 533 métodos. |
+| `tests/Browser` *(nuevo, del grupo)* | **2** | **Pruebas de SISTEMA (E2E)** con **Laravel Dusk**: navegador Chrome real contra la app desplegada (login/logout, activos). Corren vía Selenium en Docker/CI, no con `artisan test`. |
 
 ### `tests/Feature` en detalle
 En la terminología de Laravel son *"Feature tests"*. Patrón real (ej. `AccessoryCheckoutTest`): `actingAs(...)->post(route(...))`, **factories + base de datos real**, aserciones sobre respuesta HTTP, estado en BD, correos y eventos.
@@ -94,4 +95,58 @@ En la terminología de Laravel son *"Feature tests"*. Patrón real (ej. `Accesso
 
 ---
 
-*Resumen técnico base — Hito 3 (Pruebas de Integración). Curso de Pruebas de Software.*
+## 7. Entregables HITO 3 (Sprint 3–4) — mapa y estado real
+
+> Enunciado del curso: *"plan e informe de pruebas de **sistema** y **aceptación** con **despliegue CI/CD automatizado**, documentación técnica de todo el proceso"* (100 % del trabajo, 08.JUL). Estado verificado al 2026-07-09.
+
+### 7.1 Nivel Integración (Sprint 3 — COMPLETADO)
+
+| Entregable | Artefacto | Estado |
+|---|---|---|
+| Plan de Pruebas de Integración | `documentacionWiki/Plan-de-Pruebas-de-Integracion.md` v1.3 | ✅ |
+| Informe de Pruebas de Integración | `documentacionWiki/Informe-de-Pruebas-de-Integracion.md` v1.2 | ✅ (24 casos propios; defecto real INC-02 hallado y corregido) |
+| Código de pruebas propio | `tests/Feature/Integracion/` (6 archivos / 24 métodos) | ✅ verdes (SQLite 24/24 · MariaDB 19+5 por diseño) |
+| Entorno común reproducible | `HITO-3/Integracion/docker-compose.test.yml` (`test`/`test-mysql`) | ✅ |
+
+### 7.2 Nivel Sistema (Sprint 3–4 — PARCIAL)
+
+| Entregable | Artefacto | Estado |
+|---|---|---|
+| Plan de Pruebas de Sistema (E2E + no funcionales por riesgo ISO 25010) | `Plan-de-Pruebas-de-Sistema.md` v2.0 | ✅ |
+| Informe de Pruebas de Sistema | `Informe-de-Pruebas-de-Sistema.md` v1.2 | 🟡 No funcionales **4/4 PASS reales** (seguridad/rendimiento/fiabilidad); **E2E aún no verdes** |
+| Código E2E (Dusk) | `tests/Browser/` (2 archivos) + `HITO-3/Sistema/docker-compose.e2e.yml` (Selenium) | 🟡 Implementado; CI `e2e-dusk.yml` **falló — en estabilización** |
+| NF pendientes | NF-SEC-02 (403), NF-PERF-02 (dataset 500), NF-REL-01 (throttling) | 🕗 |
+
+### 7.3 Nivel Aceptación (Sprint 4 — POR HACER)
+
+| Entregable | Enfoque recomendado | Estado |
+|---|---|---|
+| Plan de Pruebas de Aceptación | UAT: criterios de aceptación por RF (reutilizar/formalizar los **CPF de caja negra** del Hito 2, opcionalmente en Gherkin), ejecutados por un "usuario" sobre el **entorno QA compartido** | ❌ Por crear |
+| Informe de Pruebas de Aceptación | Veredictos UAT + evidencias sobre la URL compartida | ❌ Por crear |
+
+### 7.4 Despliegue CI/CD y entorno QA en nube
+
+| Entregable | Artefacto | Estado |
+|---|---|---|
+| CI de pruebas (unit/integración) | Workflows `tests-{sqlite,mysql,postgres}.yml`, `tests-unit-coverage.yml` | ✅ activos |
+| CI de E2E | `.github/workflows/e2e-dusk.yml` | 🟡 creado; primera corrida falló |
+| **Entorno QA compartido en nube** (URL pública p/ caja negra, UAT y demo) | Guía Railway: `HITO-3/Despliegue-Nube/GUIA-DESPLIEGUE-NUBE.md` (Vercel descartado con justificación técnica: PHP+MySQL+FS persistente, `vendor/`=263 MB > límite 250 MB) | 🕗 Por desplegar (plan B: túnel cloudflared) |
+
+### 7.5 HITO 4 — Sustentación y entrega final (16/17 JUL)
+
+| Entregable | Contenido | Estado |
+|---|---|---|
+| **Artículo formato IEEE** | Resumen+keywords · Introducción (contexto/problema/objetivos) · Propuesta (proceso 29119 + Scrum/DevOps, niveles unitario→funcional→integración→sistema→aceptación, entornos Docker/CI/nube) · Resultados (85 % cobertura, 1 533 métodos Feature, 24 casos propios, INC-02, NF 4/4, estado E2E) · Conclusiones · Bibliografía (IEEE: 29119, 25010, Spillner, Myers) | ❌ Por redactar — **los `.md` ya están actualizados como fuente** |
+| Presentación/defensa | Todas las herramientas: Projects, Issues, Actions, Wiki, Pages + demo sobre la URL QA | 🕗 |
+| Wiki actualizada | Publicar los Planes/Informes v. finales de Sistema (y Aceptación cuando exista) | 🕗 |
+
+### 7.6 Ruta crítica sugerida (de aquí al 16/17)
+
+1. **Aceptación** (único nivel sin documentos): Plan+Informe UAT reutilizando los CPF — esfuerzo bajo, cierra el enunciado del hito.
+2. **Desplegar Railway** (URL QA) → ejecutar allí la sesión UAT y re-medir NF → evidencias.
+3. **Estabilizar `e2e-dusk.yml`** (o documentarlo como limitación con transparencia, ya redactada en el Informe de Sistema).
+4. **Artículo IEEE** (todo lo anterior es su materia prima) + video + wiki.
+
+---
+
+*Resumen técnico base — Hito 3–4 (Integración, Sistema, Aceptación y entrega final). v2, re-verificado 2026-07-09. Curso de Pruebas de Software.*
