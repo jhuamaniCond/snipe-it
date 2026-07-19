@@ -1,41 +1,36 @@
-# Informe de Pruebas de Sistema (E2E)
+# Informe de Pruebas de Sistema
 
-> **Test Completion Report** conforme a **ISO/IEC/IEEE 29119-3**. Reporta la ejecución del [Plan de Pruebas de Sistema (E2E)](Plan-de-Pruebas-de-Sistema) v2.0 sobre el sistema **desplegado con Docker**. Cubre recorridos **E2E funcionales** y atributos **no funcionales** (Seguridad, Rendimiento, Fiabilidad).
+> **Test Completion Report** conforme a **ISO/IEC/IEEE 29119-3**. Reporta la ejecución del [Plan de Pruebas de Sistema](Plan-de-Pruebas-de-Sistema) v3.0: **dos atributos oficiales (Seguridad y Desempeño)** verificados sobre el **entorno QA compartido en la nube**, con `curl` y **K6**. La automatización E2E (plus opcional) se reporta en el Anexo A.
 
 | Campo | Detalle |
 |-------|---------|
-| **Documento** | Informe de Pruebas de Sistema (E2E) — Snipe-IT |
-| **Versión** | 1.3 |
+| **Documento** | Informe de Pruebas de Sistema — Snipe-IT |
+| **Versión** | 2.1 |
 | **Hito / Sprint** | Hito 3 (Sprint 3–4) |
-| **Nivel de prueba** | Sistema (E2E + no funcional, caja negra sobre el sistema desplegado) |
-| **Herramienta E2E** | Laravel Dusk (recorridos por navegador) · `curl` (mediciones no funcionales HTTP) |
-| **Entorno** | App desplegada con Docker Compose — `http://localhost:8000` (staging) |
-| **Fecha de ejecución** | 2026-07-08 |
+| **Atributos oficiales** | **Seguridad** y **Desempeño** (ISO/IEC 25010) |
+| **Entorno QA oficial (SUT)** | VM DigitalOcean — Ubuntu 24.04 · 1 vCPU · 1 GB RAM — Docker Compose (Snipe-IT + MariaDB 11.4.7) → `http://159.223.135.124/` |
+| **Herramientas** | `curl` · **K6 `grafana/k6:1.0.0`** (versión fijada, cliente externo al SUT) |
+| **Fechas de ejecución** | 2026-07-08 (staging local) · **2026-07-09 (entorno QA en nube: curl + K6)** |
 | **Estándar** | ISO/IEC/IEEE 29119-3 · ISO/IEC 25010 |
 
 ---
 
 ## 1. Resumen ejecutivo
 
-Se verificó el sistema **desplegado** de Snipe-IT a nivel de sistema. Los atributos **no funcionales** HTTP-verificables se ejecutaron con resultados reales:
+Se verificó el sistema **desplegado en la nube** (URL pública compartida por el equipo) en sus **dos atributos oficiales**, con resultados reales:
 
-- **Seguridad:** una ruta protegida sin sesión redirige a login (**302**), y la app expone cabeceras de seguridad (`X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`) con cookie de sesión `httponly` y token CSRF. ✅
-- **Rendimiento:** el TTFB de `/login` promedia **≈0.08 s** (umbral < 2 s). ✅
-- **Fiabilidad:** una ruta inexistente devuelve **404 controlado** (sin stacktrace). ✅
+- **Seguridad ✅** — las rutas protegidas sin sesión redirigen a login (**302**), la aplicación expone cabeceras de seguridad correctas (`X-Frame-Options: DENY`, `nosniff`, `Referrer-Policy`, cookie `httponly/samesite`, CSRF).
+- **Desempeño ✅** — latencia individual TTFB ≈ **0.29 s** (umbral < 2 s) y, **bajo carga concurrente con K6 (5 VUs × 30 s)**: **p95 = 689.89 ms**, **0.00 % de errores**, 190/190 checks — **todos los umbrales cumplidos**.
+- Complementaria: **Fiabilidad ✅** (404 controlado en ruta inexistente).
 
-Los **recorridos E2E funcionales por navegador** (E2E-01…E2E-06) quedan **diseñados y listos para ejecución con Laravel Dusk** (requiere Dusk + ChromeDriver instalados); es el paso de ejecución siguiente.
-
-**Veredicto parcial:** los controles de sistema no funcionales de mayor riesgo (seguridad, rendimiento, fiabilidad) se comportan según lo esperado; no se hallaron defectos en las verificaciones ejecutadas.
-
-**Actualización v1.3 — alcance final (indicación del docente):** para la presentación final, el nivel de sistema aplica **solo DOS atributos oficiales: Seguridad y Desempeño (rendimiento)** — ambos con evidencia real PASS en este informe. La **Fiabilidad** (NF-REL-02, también PASS) se reporta como *verificación complementaria* fuera del alcance oficial. Asimismo, el docente indicó que la **automatización E2E "ya no es prioridad"** (plus opcional): lo implementado (Dusk + Selenium + workflow CI) se presenta como **plus parcial** con su estado transparente (§5.4), sin obligación de corrida verde. Para reforzar el atributo Desempeño se recomienda **K6** (carga con usuarios virtuales y umbrales p95), mencionado en la bibliografía del curso.
+**Veredicto: el sistema desplegado cumple los dos atributos oficiales sin defectos.** La observación relevante es de capacidad: bajo 5 usuarios concurrentes la latencia media sube de ~0.29 s a ~0.58 s (VM de 1 vCPU/1 GB), permaneciendo 3× por debajo del umbral.
 
 ---
 
 ## 2. Base de la prueba
 
-- **Plan de referencia:** [Plan de Pruebas de Sistema (E2E)](Plan-de-Pruebas-de-Sistema) v2.0.
-- **Trazabilidad:** E2E-0X → RF-XX / CPF-XX; NF-* → ISO/IEC 25010 (Matriz de Trazabilidad).
-- **Selección no funcional:** 3 características por riesgo (Seguridad, Rendimiento, Fiabilidad) — fundamentación en el Plan §6.
+- **Plan de referencia:** [Plan de Pruebas de Sistema](Plan-de-Pruebas-de-Sistema) v3.0 (dos atributos por indicación del docente; selección por riesgo ISO 25010).
+- **Trazabilidad:** NF-* → atributos ISO 25010; la validación funcional del sistema quedó cubierta por los CPF (caja negra manual, Hito 2) e INT (integración, Hito 3) — [Matriz de Trazabilidad](Matriz-de-Trazabilidad).
 
 ---
 
@@ -43,81 +38,88 @@ Los **recorridos E2E funcionales por navegador** (E2E-01…E2E-06) quedan **dise
 
 | Bloque | Estado |
 |--------|--------|
-| No funcional — Seguridad (NF-SEC-01 + cabeceras) | ✅ Ejecutado (real) |
-| No funcional — Rendimiento (NF-PERF-01) | ✅ Ejecutado (real) |
-| No funcional — Fiabilidad (NF-REL-02) | ✅ Ejecutado (real) |
-| No funcional — NF-SEC-02, NF-PERF-02, NF-REL-01 | 🕗 Pendiente (403 autenticado / dataset de volumen / throttling) |
-| E2E funcional — E2E-01…E2E-06 | 🟡 **Implementados** (`tests/Browser/`, Dusk); **infraestructura verificada** (Selenium+Chrome+app+MariaDB levantan y Dusk ejecuta); **corrida en CI aún no verde — en estabilización** (ver §5.4) |
+| **Seguridad** — NF-SEC-01 + cabeceras (contra la URL QA en nube) | ✅ Ejecutado (real) |
+| **Desempeño** — NF-PERF-01 (curl) + **NF-PERF-K6 (carga)** contra la URL QA | ✅ Ejecutado (real) |
+| Complementaria — NF-REL-02 (fiabilidad) | ✅ Ejecutado (real) |
+| NF-SEC-02/03 (403 autenticado, logout) · NF-PERF-02 (volumen) · NF-REL-01 (throttling) | 🕗 Pendientes |
+| E2E automatizado (plus opcional) | Ver **Anexo A** |
 
 ---
 
 ## 4. Herramientas y entorno
 
-- **Despliegue:** `docker compose up -d` (app Apache/PHP + MariaDB) → `http://localhost:8000` (staging). La app respondió al primer intento tras el arranque.
-- **Mediciones no funcionales:** `curl -w` (estados HTTP, TTFB) y revisión de cabeceras.
-- **E2E funcional:** **Laravel Dusk** (navegador real) — herramienta elegida por el stack PHP/Laravel (equivalente de Cypress/Playwright).
+- **SUT (nube):** `http://159.223.135.124/` — VM DigitalOcean administrada por el grupo vía SSH (clave excluida del repo por `.gitignore`); Snipe-IT + MariaDB 11.4.7 con Docker Compose. **Único entorno oficial de evidencias** (el Docker local queda para desarrollo).
+- **Clientes de medición (externos al SUT):** `curl` (estados, cabeceras, TTFB) y **K6 `1.0.0` fijada** ejecutada vía Docker desde la PC del tester — entorno compartido en `tests/tests_k6/` (compose + wrapper + reglas). El generador de carga **nunca** corre dentro de la VM para no contaminar la medición.
+- **Datos:** los scripts de desempeño usan **endpoints de solo lectura** — no escriben en la BD del entorno QA.
 
 ---
 
 ## 5. Resultados de ejecución
 
-### 5.1 No funcionales (ejecutados — datos reales)
+### 5.1 Atributo oficial 1 — SEGURIDAD (2026-07-09, contra la nube)
 
-| ID | Característica | Verificación | Resultado esperado | Resultado real | Veredicto |
-|----|---------------|--------------|--------------------|----------------|-----------|
-| NF-SEC-01 | Seguridad | `GET /hardware` sin sesión | 302 → `/login` | **HTTP 302 → `http://localhost:8000/login`** | ✅ PASS |
-| NF-SEC-hdr | Seguridad | Cabeceras de `/login` | Controles presentes | **X-Frame-Options: DENY · nosniff · Referrer-Policy · cookie httponly/samesite · CSRF** | ✅ PASS |
-| NF-PERF-01 | Rendimiento | TTFB de `/login` (5 tomas) | < 2 s | **TTFB ≈ 0.077 s (máx 0.082 s)** | ✅ PASS |
-| NF-REL-02 | Fiabilidad | Ruta inexistente | 404 controlado | **HTTP 404** | ✅ PASS |
+| ID | Verificación | Resultado esperado | Resultado real | Veredicto |
+|----|--------------|--------------------|----------------|-----------|
+| NF-SEC-01 | `GET /` y `GET /hardware` sin sesión | 302 → `/login`, sin exponer datos | **HTTP 302 → `http://159.223.135.124/login`** | ✅ PASS |
+| NF-SEC-hdr | Cabeceras de `/login` | Controles presentes | **`X-Frame-Options: DENY` · `X-Content-Type-Options: nosniff` · `Referrer-Policy: same-origin` · cookie `httponly; samesite=lax` · token CSRF (XSRF-TOKEN)** | ✅ PASS |
 
-> Evidencia: `HITO-3/Sistema/Evidencias/RESULTADO-NO-FUNCIONALES-HTTP.md`.
+### 5.2 Atributo oficial 2 — DESEMPEÑO (2026-07-09, contra la nube)
 
-### 5.2 No funcionales pendientes
+**a) Latencia individual (curl):**
 
-| ID | Característica | Motivo de pendiente |
-|----|---------------|---------------------|
-| NF-SEC-02 | Seguridad | Requiere sesión de usuario limitado para provocar el 403 |
-| NF-PERF-02 | Rendimiento | Requiere sembrar ≈500 activos (dataset de volumen) |
-| NF-REL-01 | Fiabilidad | Requiere POST repetidos con CSRF hasta el lockout de login |
+| ID | Verificación | Umbral | Resultado real | Veredicto |
+|----|--------------|--------|----------------|-----------|
+| NF-PERF-01 | TTFB de `/login` (3 tomas por red pública) | < 2 s | **0.289 – 0.293 s** | ✅ PASS |
 
-### 5.3 E2E funcionales (diseñados — ejecución con Dusk pendiente)
+**b) Carga concurrente con K6 (NF-PERF-K6) — configuración mínima: 5 VUs × 30 s:**
 
-| ID | Escenario E2E | Endpoint/UI | Resultado esperado | Resultado real |
-|----|---------------|-------------|--------------------|----------------|
-| E2E-01 | Login válido | `/login` → dashboard | Sesión iniciada; redirige a `/` | ⟦pendiente Dusk⟧ |
-| E2E-02 | Crear activo | Assets → Create | Activo en el listado | ⟦pendiente Dusk⟧ |
-| E2E-03 | Checkout de activo | Asset → Checkout | "Checked out to"; Deployed | ⟦pendiente Dusk⟧ |
-| E2E-04 | Checkin de activo | Asset → Checkin | Disponible; sin asignación | ⟦pendiente Dusk⟧ |
-| E2E-05 | Crear licencia N asientos | Licenses → Create | N filas en Seats | ⟦pendiente Dusk⟧ |
-| E2E-06 | Logout | Menú → Logout | Redirige a `/login` | ⟦pendiente Dusk⟧ |
+| Métrica K6 | Umbral | Resultado real | Veredicto |
+|------------|--------|----------------|-----------|
+| `http_req_duration p(95)` | **< 2000 ms** | **689.89 ms** | ✅ PASS |
+| `http_req_failed` | **< 1 %** | **0.00 %** (0/95) | ✅ PASS |
+| Checks (status 200 + página renderizada) | 100 % | **100 %** (190/190) | ✅ PASS |
+| Detalle de latencias | — | avg 578 ms · min 466 ms · med 582 ms · max 734 ms · p90 660 ms | — |
+| Volumen | — | 95 peticiones (3.15 req/s) · 5 VUs constantes · 0 iteraciones interrumpidas | — |
 
-> Nota: los RF que cubren estos recorridos ya fueron verificados a nivel **funcional (caja negra manual, Hito 2)** e **integración (HTTP, Hito 3)**. El E2E los revalida **por la UI real desplegada**.
+**c) Perfiles de carga oficiales (configuración mínima del docente) + escenario real (2026-07-09):**
 
-### 5.4 Automatización E2E — infraestructura y estado de ejecución (transparencia)
+| Escenario | VUs × Dur. | Iteraciones | T. promedio | T. máximo | Throughput | Exitosas / Fallidas | % errores | p95 | Umbral p95 |
+|---|---|---:|---:|---:|---:|---:|---:|---:|:--:|
+| NF-PERF-K6-1 | 20 × 30 s | 275 | 1.23 s | 5.15 s | 8.73 req/s | 275 / 0 | 0.00 % | 1.98 s | ✅ *(límite)* |
+| NF-PERF-K6-2 | 50 × 45 s | 417 | 4.74 s | 15.35 s | 8.47 req/s | 417 / 0 | 0.00 % | 12.10 s | ❌ |
+| NF-PERF-K6-3 | 100 × 60 s | 459 | 13.02 s | 37.06 s | 6.83 req/s | 459 / 0 | 0.00 % | 29.52 s | ❌ |
+| **NF-PERF-K6-R (rampa** 0→20→50→100→0**)** | 120 s | 639 | 8.03 s | 23.33 s | 5.31 req/s | 639 / 0 | 0.00 % | 20.20 s | ❌ |
 
-Se implementó la automatización E2E completa con **Laravel Dusk**:
+**Interpretación (hallazgo de capacidad, no defecto del software):**
+1. **0 % de errores en ~1 900 peticiones**: el sistema nunca devuelve 5xx — ante sobrecarga **encola** y termina todas en 200 (**degradación elegante**).
+2. **Punto de saturación ≈ 20 VUs / ~8.5–8.7 req/s**: el throughput se estanca entre 20 y 50 VUs — es la capacidad máxima de la VM de 1 vCPU; desde ahí, más usuarios = más cola, no más trabajo.
+3. **Latencia crece casi linealmente con los usuarios por encima de la saturación** (p95: 1.98 s → 12.1 s → 29.5 s), y con 100 VUs el throughput incluso **cae** (6.8 req/s) por la sobrecarga de gestionar conexiones.
+4. **Veredicto de capacidad**: el entorno QA atiende **hasta ~20 usuarios concurrentes dentro del umbral** — holgado para el equipo (6 personas) y la sustentación. Soportar 50–100 concurrentes exigiría escalar la VM (vCPU/RAM) o afinar PHP-FPM. Los ❌ de los perfiles altos documentan el **límite del hardware contratado**, que es exactamente lo que una prueba de carga debe revelar.
+5. La **rampa** (escenario real: llegada escalonada del personal) confirma la entrada y salida de la zona de saturación con recuperación automática (mín. 0.19 s en valle).
 
-- **Código de pruebas:** `tests/Browser/AuthenticationE2ETest.php` (login/logout, RF-09) y `tests/Browser/AssetE2ETest.php` (activo visible, oferta de checkout).
-- **Infraestructura Docker:** `trabajoLibelula/HITO-3/Sistema/docker-compose.e2e.yml` — orquesta **Selenium/Chrome (headless) + app Snipe-IT + MariaDB** en la red interna de Docker (sin exponer puertos del host).
-- **CI:** workflow `.github/workflows/e2e-dusk.yml` que ejecuta ese stack en un runner **Linux** de GitHub Actions.
+> Evidencias: `HITO-3/Sistema/Evidencias/RESULTADO-K6-DESEMPENO.md` (smoke), **`RESULTADO-K6-PERFILES-CARGA.md` (perfiles oficiales + interpretación completa)** y `RESULTADO-NO-FUNCIONALES-HTTP.md` (curl local y nube).
 
-**Estado de ejecución (honesto):**
+### 5.3 Complementaria — Fiabilidad (fuera del alcance oficial, ya ejecutada)
 
-| Aspecto | Estado |
-|---------|--------|
-| Stack E2E levanta (Selenium+Chrome+app+MariaDB) | ✅ Verificado |
-| Dusk ejecuta y conecta al navegador (sesiones Chrome) | ✅ Verificado |
-| Migraciones + seed de settings en la BD de prueba | ✅ Verificado |
-| **Corrida E2E en verde (aserciones)** | ❌ **Aún no verde** — la corrida en **CI** (`e2e-dusk.yml`) **falló** (2026-07-08); requiere estabilización |
+| ID | Verificación | Resultado real | Veredicto |
+|----|--------------|----------------|-----------|
+| NF-REL-02 | `GET /noexiste-xyz` | **HTTP 404** controlado (sin stacktrace) | ✅ PASS |
 
-> **Estado real (transparente):** los E2E **no están en verde todavía**. En **local (Windows)** la app servida sobre el *bind-mount* de Docker rechaza conexiones del navegador (`net::ERR_CONNECTION_REFUSED`) — limitación del FS de Docker en Windows. Se trasladó la ejecución a **CI Linux** (`e2e-dusk.yml`), donde ese problema no aplica, pero la **primera corrida en CI falló** y requiere **estabilización** (probables ajustes de tiempos de arranque de la app, esperas del navegador y selectores `select2` del checkout). Lo **verificado** es la infraestructura (el stack levanta y **Dusk ejecuta** contra Chrome); la **corrida verde queda como trabajo pendiente**. No se reportan E2E como aprobados.
+### 5.4 Pendientes
+
+| ID | Motivo |
+|----|--------|
+| NF-SEC-02 / NF-SEC-03 | Requieren sesión de usuario limitado / flujo de logout en navegador |
+| NF-PERF-02 | Requiere sembrar dataset de volumen (≈500 activos) en QA |
+| NF-REL-01 | Requiere POST repetidos con CSRF hasta el lockout |
 
 ---
 
 ## 6. Defectos y observaciones
 
-- **Sin defectos** en las verificaciones ejecutadas (NF-SEC, NF-PERF, NF-REL).
-- **OBS-SIS-01:** el TTFB medido (~0.08 s) corresponde a la página `/login` con la app recién iniciada y sin carga concurrente; los umbrales de NF-PERF-02 (listado con volumen) deben medirse con el dataset sembrado para ser representativos.
+- **Defectos: 0** en todas las verificaciones ejecutadas.
+- **OBS-SIS-01 (capacidad):** bajo 5 usuarios concurrentes la latencia media sube de ~0.29 s (petición individual) a **~0.58 s** — efecto de la concurrencia sobre 1 vCPU/1 GB. El p95 (690 ms) queda 3× bajo el umbral: la VM soporta con holgura la carga de trabajo del equipo. Una prueba de **estrés** (más VUs) requeriría coordinación y swap/resize de la VM.
+- **OBS-SIS-02 (metodología):** los resultados de desempeño son **relativos al entorno QA declarado** (1 vCPU/1 GB, red pública); así deben interpretarse las cifras.
 
 ---
 
@@ -125,45 +127,61 @@ Se implementó la automatización E2E completa con **Laravel Dusk**:
 
 | Métrica | Valor |
 |---------|-------|
-| Casos no funcionales ejecutados | 4 (NF-SEC-01, NF-SEC-hdr, NF-PERF-01, NF-REL-02) |
-| No funcionales PASS | 4 / 4 (100 %) |
-| TTFB medio `/login` | ≈ 0.077 s |
-| Defectos de sistema | 0 |
-| E2E funcionales implementados (Dusk) | 2 archivos / 5 casos — infra verificada; corrida verde en CI (pendiente) |
-| No funcionales pendientes | 3 |
+| Casos oficiales ejecutados (Seguridad + Desempeño) | 4 (NF-SEC-01, NF-SEC-hdr, NF-PERF-01, NF-PERF-K6) |
+| PASS | **4/4 (100 %)** |
+| K6 — p95 bajo carga | **689.89 ms** (umbral 2000 ms) |
+| K6 — tasa de error | **0.00 %** |
+| K6 — checks | 190/190 (100 %) |
+| TTFB individual `/login` (nube) | ≈ 0.29 s |
+| Complementarias ejecutadas | 1 (NF-REL-02, PASS) |
+| Defectos de sistema | **0** |
+| Pendientes | 4 (NF-SEC-02/03, NF-PERF-02, NF-REL-01) |
 
 ---
 
-## 8. Evaluación de criterios de salida (del Plan §8)
+## 8. Evaluación de criterios de salida (Plan §7)
 
 | Criterio | Estado |
 |----------|--------|
-| App desplegada y accesible (Docker) | ✅ Verificado |
-| NF de Seguridad/Rendimiento/Fiabilidad ejecutadas | 🟡 Parcial — HTTP-verificables ✅; faltan NF-SEC-02, NF-PERF-02, NF-REL-01 |
-| E2E-01…E2E-06 implementados y con infraestructura funcionando | ✅ (código + Docker Selenium/Chrome + workflow CI) |
-| E2E-01…E2E-06 corrida verde | ❌ Aún no — CI (`e2e-dusk.yml`) falló el 2026-07-08; en estabilización (local bloqueado por el FS de Docker en Windows) |
-| Defectos registrados | ✅ (0 defectos; 1 observación) |
+| Entorno QA en nube desplegado y accesible | ✅ |
+| Entorno K6 compartido (versión fijada 1.0.0) operativo | ✅ |
+| Seguridad ejecutada contra la URL QA, sin defectos altos | ✅ (NF-SEC-02/03 pendientes, sin hallazgos en lo ejecutado) |
+| Desempeño ejecutado contra la URL QA, umbrales cumplidos | ✅ (curl + K6; NF-PERF-02 pendiente) |
 | Resultados documentados en el Informe | ✅ (este documento) |
 
 ---
 
 ## 9. Conclusiones y recomendaciones
 
-1. **El sistema desplegado cumple los controles no funcionales de mayor riesgo verificados:** protege rutas sin sesión (302), presenta cabeceras de seguridad correctas, responde rápido (TTFB ~0.08 s) y maneja errores (404) de forma controlada.
-2. **Selección no funcional fundamentada:** se probaron **3 características por riesgo** (Seguridad, Rendimiento, Fiabilidad, ISO 25010), no todas — coherente con pruebas basadas en riesgo de ISO 29119.
-3. **Automatización E2E implementada; corrida verde aún pendiente.** Se implementaron los E2E con **Laravel Dusk** y su infraestructura Docker (Selenium/Chrome + app + MariaDB), verificando que el stack levanta y Dusk ejecuta. La ejecución se trasladó a un workflow de **CI Linux** (`e2e-dusk.yml`) porque el *bind-mount* de Docker en Windows impide servir la app de forma fiable al navegador (`ERR_CONNECTION_REFUSED`). La **primera corrida en CI falló** y los E2E **quedan en estabilización** (ajuste de esperas/selectores). Se reporta con transparencia: **no se dan por aprobados**. El valor entregado es la **automatización lista para estabilizar** y la evidencia de que el pipeline E2E existe en DevOps.
-4. **Trabajo siguiente:** completar NF-SEC-02, NF-PERF-02, NF-REL-01 (403 autenticado, dataset de volumen, throttling) y consolidar los recorridos de checkout E2E (refinar los selectores `select2`).
-5. **Reutilización en Aceptación:** los recorridos E2E pueden reformularse como criterios de aceptación (UAT) en el *Informe de Pruebas de Aceptación*.
+1. **El sistema desplegado en la nube cumple los dos atributos oficiales**: Seguridad (302 + cabeceras correctas) y Desempeño (p95 = 690 ms bajo carga, 0 % errores) — sin defectos.
+2. **K6 aportó la dimensión que faltaba** (concurrencia): la medición pasó de tomas puntuales (`curl`) a carga sostenida con percentiles y umbrales verificables — con **versión fijada (1.0.0)** para que todo el grupo mida igual.
+3. **La arquitectura de medición es correcta**: cliente de carga externo al SUT, scripts de solo lectura (no contaminan la BD del entorno compartido), resultados interpretados relativos al hardware declarado.
+4. **Trabajo restante (menor):** NF-SEC-02/03, NF-PERF-02 (dataset de volumen) y NF-REL-01; opcionalmente un perfil de carga mayor coordinado (con swap/resize previo de la VM).
+5. La automatización **E2E** queda como plus opcional documentado con transparencia (Anexo A).
 
 ---
 
-## Anexo — Evidencias y artefactos
-- `HITO-3/Sistema/Evidencias/RESULTADO-NO-FUNCIONALES-HTTP.md` — mediciones reales (seguridad, rendimiento, fiabilidad) con comandos de reproducción.
-- `tests/Browser/AuthenticationE2ETest.php`, `tests/Browser/AssetE2ETest.php` — pruebas E2E (Laravel Dusk).
-- `trabajoLibelula/HITO-3/Sistema/docker-compose.e2e.yml` — stack E2E (Selenium/Chrome + app + MariaDB).
-- `.github/workflows/e2e-dusk.yml` — ejecución de los E2E en CI (Linux).
-- `trabajoLibelula/HITO-3/Sistema/GUIA-E2E-DOCKER.md` — guía de uso.
-- Plan de referencia: `documentacionWiki/Plan-de-Pruebas-de-Sistema.md` (v2.0).
+## Anexo A — Automatización E2E (plus opcional, no prioritario)
+
+> Indicación del docente: la automatización E2E *"ya no es prioridad"*. Se reporta lo implementado con su estado real, **sin darlo por aprobado**.
+
+| Aspecto | Estado |
+|---------|--------|
+| Código E2E (Laravel Dusk): `tests/Browser/AuthenticationE2ETest.php`, `AssetE2ETest.php` (5 casos: login válido/inválido, logout, activo visible, checkout ofrecido) | ✅ Implementado |
+| Infraestructura Docker: `docker-compose.e2e.yml` (Selenium/Chrome headless + app + MariaDB, red interna) | ✅ Verificada (stack levanta; Dusk conecta y ejecuta) |
+| Workflow CI: `.github/workflows/e2e-dusk.yml` (runner Linux; sube capturas si falla) | ✅ Creado |
+| **Corrida verde (aserciones)** | ❌ **Aún no** — la primera corrida en CI falló (2026-07-08); en local (Windows) el bind-mount de Docker impide servir la app de forma fiable al navegador (`ERR_CONNECTION_REFUSED`). En estabilización; **no exigible** |
+| Precaución | Dusk **trunca la BD**: nunca apuntarlo al entorno QA compartido; solo a BD desechables |
+
+---
+
+## Anexo B — Evidencias y artefactos
+
+- `HITO-3/Sistema/Evidencias/RESULTADO-K6-DESEMPENO.md` — salida íntegra de la corrida K6 (5 VUs × 30 s) contra la nube.
+- `HITO-3/Sistema/Evidencias/RESULTADO-NO-FUNCIONALES-HTTP.md` — mediciones `curl` (staging local 2026-07-08 y nube 2026-07-09).
+- `tests/tests_k6/` — entorno K6 compartido (compose con pin `1.0.0`, wrapper, script oficial, README con reglas).
+- `tests/Browser/`, `HITO-3/Sistema/docker-compose.e2e.yml`, `.github/workflows/e2e-dusk.yml` — plus E2E (Anexo A).
+- Plan de referencia: `Plan-de-Pruebas-de-Sistema.md` v3.0.
 
 ---
 
@@ -171,9 +189,11 @@ Se implementó la automatización E2E completa con **Laravel Dusk**:
 
 | Versión | Fecha | Cambios |
 |---------|-------|---------|
-| 1.0 | 2026-07-08 | Informe inicial: ejecución de no funcionales HTTP (NF-SEC/PERF/REL, 4/4 PASS con datos reales sobre la app desplegada); E2E funcionales diseñados y pendientes de ejecución con Dusk; métricas y criterios de salida. |
-| 1.1 | 2026-07-08 | Automatización E2E implementada (Laravel Dusk) + infraestructura Docker (Selenium/Chrome) + workflow CI `e2e-dusk.yml`. §5.4 con el **estado de ejecución transparente**: stack y Dusk verificados; **corrida verde pendiente en CI Linux** (el bind-mount de Docker en Windows impide la corrida local). Sin inflar resultados. |
-| 1.2 | 2026-07-08 | Corregido tras el resultado real: la **primera corrida E2E en CI falló**; se marca como **"aún no verde / en estabilización"** en §3, §5.4, §8 y §9 (sin reportar E2E como aprobados). Las pruebas no funcionales de sistema permanecen ejecutadas y verdes (4/4). |
-| 1.3 | 2026-07-09 | Alcance final por indicación del docente: **dos atributos oficiales** (Seguridad + Desempeño, ambos PASS); Fiabilidad como verificación complementaria. **E2E reclasificado como plus opcional** ("ya no es prioridad"). Recomendación de **K6** para Desempeño. |
+| 1.0 | 2026-07-08 | Informe inicial: no funcionales HTTP sobre staging local (4/4 PASS); E2E diseñados. |
+| 1.1–1.2 | 2026-07-08 | Automatización E2E implementada; estado transparente tras fallo en CI (no verde). |
+| 1.3 | 2026-07-09 | Dos atributos oficiales (docente); E2E reclasificado plus; K6 recomendado. |
+| 1.4 | 2026-07-09 | Migración del staging a la nube y re-ejecución `curl` contra la URL pública. |
+| **2.0** | 2026-07-09 | **Reestructuración**: resultados organizados por atributo oficial contra el entorno QA en nube; **primera corrida real de K6** (5 VUs × 30 s: p95 690 ms, 0 % errores — PASS); observaciones de capacidad; **E2E desplazado al Anexo A**. |
+| 2.1 | 2026-07-09 | **Perfiles de carga oficiales ejecutados** (20×30 s ✅ límite · 50×45 s ❌ · 100×60 s ❌ · rampa ❌) con las métricas exigidas por escenario e **interpretación**: 0 % errores en ~1 900 peticiones (degradación elegante), saturación ≈ 20 VUs / 8.5 req/s, hallazgo de **capacidad del hardware** (no defecto del software). |
 
-*Fin del documento — Informe de Pruebas de Sistema (E2E).*
+*Fin del documento — Informe de Pruebas de Sistema.*

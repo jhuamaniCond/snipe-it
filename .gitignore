@@ -71,3 +71,8 @@ storage/ldap_client_tls.key
 /storage/framework/testing
 
 /.phpunit.cache
+# --- Grupo: claves privadas SSH del entorno de pruebas en nube (NUNCA subir) ---
+id_ed25519
+id_ed25519.*
+*.pem
+trabajoLibelula/Entorno_Pruebas/id_ed25519*

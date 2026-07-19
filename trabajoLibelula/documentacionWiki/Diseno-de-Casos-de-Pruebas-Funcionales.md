@@ -42,17 +42,22 @@ A diferencia de la v1.0, cada requisito de esta versión se ancló al **comporta
 
 ## 2. Entorno de pruebas
 
+> **Actualización (2026-07-09): entorno QA oficial EN LA NUBE.** Las pruebas de caja negra ya **no** se ejecutan en despliegues locales individuales, sino en una **instancia QA única compartida por todo el equipo**, desplegada en una máquina virtual en la nube. Esto garantiza que los 6 integrantes (y el docente) prueban **el mismo sistema, con los mismos datos, bajo las mismas condiciones**.
+
 | Elemento | Definición |
 |----------|------------|
-| Aplicación bajo prueba (AUT) | Snipe-IT desplegado (Docker Compose del repositorio o instancia QA equivalente) |
-| Tipo de acceso | Navegador web, interfaz administrativa (AdminLTE 2 / Bootstrap 3) |
+| **Entorno QA oficial** | **VM en DigitalOcean** — Ubuntu 24.04 LTS x64 · 1 vCPU · 1 GB RAM · 25 GB SSD |
+| **URL de la aplicación (AUT)** | **http://159.223.135.124/** — Snipe-IT desplegado con Docker Compose (app + MariaDB 11.4.7) |
+| Acceso administrativo | SSH con clave privada (`ssh -i id_ed25519 root@159.223.135.124`, desde PowerShell/OpenSSH); la clave y credenciales se comparten **solo por el canal privado del grupo** (excluidas del repositorio vía `.gitignore`) |
+| Tipo de acceso de prueba | Navegador web, interfaz administrativa (AdminLTE 2 / Bootstrap 3) |
 | Perfil de ejecución | Usuario con permisos adecuados por caso (superusuario o permiso granular: `checkoutAssets`, `checkinAssets`, `checkoutConsumables`, `deleteCategories`, etc.) |
-| Datos base | Modelos de activo, status labels, categorías, usuarios y ubicaciones poblados mediante seeders/factories antes de la sesión |
-| Motor de base de datos | El del despliegue QA (MySQL/PostgreSQL); el comportamiento funcional es independiente del motor |
+| Datos base | Modelos de activo, status labels, categorías, usuarios y ubicaciones poblados antes de la sesión (mismos datos QA de los guiones RF-02…RF-11) |
+| Motor de base de datos | **MariaDB 11.4.7** (contenedor `snipe-it-db-1`); el comportamiento funcional es independiente del motor |
 | Configuración FMCS | `full_multiple_companies_support` desactivado por defecto; se activa solo en los casos que lo requieren (RF-02 variante multiempresa) |
-| Registro de evidencia | Capturas de pantalla por caso, adjuntas en el informe; defectos en GitHub Issues (etiqueta `bug`) |
+| Registro de evidencia | Capturas de pantalla por caso **tomadas sobre la URL del entorno QA en nube**, adjuntas en el informe; defectos en GitHub Issues (etiqueta `bug`) |
+| Entorno local (secundario) | El Docker Compose local (`http://localhost:8000`) queda solo como entorno de **desarrollo/preparación**, no para evidencias oficiales |
 
-> **Precondición global del entorno:** la instancia de QA debe estar accesible, migrada y con datos de demostración cargados antes de iniciar la sesión de ejecución. Mientras no exista evidencia de ejecución manual, los casos figuran como **pendientes de validación** en el informe.
+> **Precondición global del entorno:** la instancia QA en nube debe estar accesible, migrada y con datos de demostración cargados antes de iniciar la sesión de ejecución. Las capturas de evidencia deben mostrar la **URL del entorno QA** (159.223.135.124) en la barra del navegador. Mientras no exista evidencia de ejecución manual, los casos figuran como **pendientes de validación** en el informe.
 
 ---
 

@@ -1,191 +1,190 @@
-# Plan de Pruebas de Sistema (E2E)
+# Plan de Pruebas de Sistema
 
-> Conforme a **ISO/IEC/IEEE 29119-3**. Nivel de **Sistema** del Modelo-V: **verificación** del sistema integrado completo contra sus requisitos, ejercitado de extremo a extremo (**E2E**) por la interfaz de usuario sobre el sistema **desplegado**. La ejecución y sus resultados se reportan en el [Informe de Pruebas de Sistema](Informe-de-Pruebas-de-Sistema).
+> Conforme a **ISO/IEC/IEEE 29119-3**. Nivel de **Sistema** del Modelo-V: **verificación** del sistema completo **desplegado**, desde su interfaz externa. Alcance oficial según la indicación final del docente: **dos atributos no funcionales** — **Seguridad y Desempeño** — ejecutados sobre el **entorno QA compartido en la nube**. La automatización E2E queda como **plus opcional** (Anexo A). Los resultados se reportan en el [Informe de Pruebas de Sistema](Informe-de-Pruebas-de-Sistema).
 
 | Campo | Detalle |
 |-------|---------|
-| **Documento** | Plan de Pruebas de Sistema (E2E) — Snipe-IT |
-| **Versión** | 2.1 (v2.0 refinó a E2E + no-funcional por riesgo; v2.1 fija **2 atributos oficiales**: Seguridad y Desempeño) |
+| **Documento** | Plan de Pruebas de Sistema — Snipe-IT |
+| **Versión** | 3.0 (reestructurado: atributos oficiales al núcleo, E2E al Anexo) |
 | **Hito / Sprint** | Hito 3 (Sprint 3–4) |
-| **Nivel de prueba** | Sistema (E2E, caja negra sobre el sistema desplegado) |
-| **Herramienta E2E** | **Laravel Dusk** (navegador real / ChromeDriver) — equivalente en el stack a Cypress/Playwright |
-| **Entorno** | App desplegada con **Docker Compose** (staging), MariaDB con datos de prueba |
-| **Estándar** | ISO/IEC/IEEE 29119-3 · modelo de calidad **ISO/IEC 25010** |
-| **Fecha** | 2026-07-08 |
+| **Nivel de prueba** | Sistema (caja negra sobre el sistema desplegado) |
+| **Atributos oficiales** | **Seguridad** y **Desempeño** (ISO/IEC 25010, selección por riesgo) |
+| **Herramientas** | `curl` (estados/cabeceras/TTFB) · **K6 `grafana/k6:1.0.0`** (carga con usuarios virtuales) |
+| **Entorno QA oficial** | **VM DigitalOcean** — Ubuntu 24.04 LTS · 1 vCPU · 1 GB RAM · 25 GB SSD — Docker Compose (Snipe-IT + MariaDB 11.4.7) → **http://159.223.135.124/** |
+| **Estándar** | ISO/IEC/IEEE 29119-3 · ISO/IEC 25010 |
+| **Fecha** | 2026-07-09 |
 
 ---
 
 ## 1. Introducción y objetivos
 
-Mientras las pruebas **unitarias** aíslan un método y las de **integración** validan las interfaces entre subsistemas por HTTP, las pruebas de **sistema** validan el **producto completo desplegado**, recorriendo **flujos de negocio de punta a punta (E2E)** tal como los ejecuta un usuario real en el navegador. Se verifica la funcionalidad **y** atributos **no funcionales** clave del sistema en ejecución.
+Las pruebas de sistema validan el **producto completo desplegado** desde su interfaz externa, en un entorno representativo. La verificación **funcional** del sistema ya está cubierta por los niveles previos (caja negra manual CPF del Hito 2, integración del Hito 3); este plan concentra el nivel de sistema en los **atributos no funcionales de mayor riesgo**, medidos sobre el **entorno QA real en la nube** — el mismo que usa todo el equipo y que verá el docente.
 
 **Objetivos:**
-1. Verificar los **recorridos E2E** principales (login → crear activo → checkout → checkin → licencia → logout) sobre la aplicación desplegada.
-2. Verificar atributos **no funcionales** de alto riesgo (§6): **Seguridad, Rendimiento y Fiabilidad**.
-3. Confirmar que el sistema, desplegado vía **CI/CD**, se comporta según lo especificado en un entorno cercano a producción.
-
-> **Distinción con Aceptación:** este plan es **verificación** (¿cumple la especificación?). La **validación** frente a las necesidades del usuario (UAT / criterios de aceptación) se cubre en el *Plan de Pruebas de Aceptación*. Los mismos recorridos E2E pueden reutilizarse allí como criterios de aceptación.
+1. Verificar el atributo **Seguridad** (protección de rutas, cabeceras, sesión) sobre la URL pública.
+2. Verificar el atributo **Desempeño** (latencia individual y **bajo carga concurrente con K6**) sobre la URL pública.
+3. Confirmar que el sistema desplegado vía Docker en la nube se comporta según lo especificado.
 
 ---
 
 ## 2. Alcance
 
-### 2.1 En alcance
-- **E2E funcional** por la UI: autenticación, gestión de activos (crear, checkout, checkin), licencias y cierre de sesión.
-- **No funcional** a nivel sistema: **Seguridad, Rendimiento y Fiabilidad** (justificación en §6).
-- Ejecución sobre el **sistema desplegado** (Docker), no sobre `:memory:`.
+### 2.1 En alcance (oficial)
+- **Seguridad** y **Desempeño** a nivel de sistema, contra `http://159.223.135.124/`.
+- Verificaciones complementarias ya ejecutadas (Fiabilidad) se reportan como adicionales.
 
 ### 2.2 Fuera de alcance
-- Lógica interna de un método (nivel unidad) y contratos internos (nivel integración) — cubiertos en Hitos 2–3.
-- Integraciones externas reales (LDAP/SAML/MTA/S3) — se simulan o difieren.
-- Compatibilidad multi-navegador exhaustiva y portabilidad (bajo riesgo, §6). La **compatibilidad multi-motor de BD** ya se cubre con la matriz de CI (`tests-mysql/postgres/sqlite.yml`).
+- Funcionalidad interna (cubierta por unitarias/integración) y validación funcional por UI (cubierta por los CPF de caja negra manual).
+- Estrés a gran escala (la VM QA es compartida, 1 vCPU/1 GB; ver riesgos RS-05/RS-06).
+- Integraciones externas reales (LDAP/SAML/MTA).
+- **E2E automatizado**: reclasificado como **plus opcional** por el docente → **Anexo A**.
 
 ---
 
-## 3. Enfoque y herramienta (justificación por stack)
+## 3. Estrategia y herramientas
 
-El E2E recorre la app **por el navegador**. Como el stack es **PHP/Laravel**, la herramienta natural es **Laravel Dusk** (controla ChromeDriver, expresa los pasos en código PHP versionado junto a la app y se integra con GitHub Actions). Es el equivalente, para este stack, de **Cypress/Playwright/Selenium**. Igual que en integración (Supertest → PHPUnit `Feature`), **la herramienta depende del stack**.
+### 3.1 Arquitectura de medición: cliente FUERA del sistema bajo prueba
 
-- **Entorno E2E:** la app se levanta con `docker compose up -d` (staging); Dusk apunta a `APP_URL` y maneja su propia base de datos de prueba.
-- **Datos:** seeders/factories para el estado inicial (admin, catálogos) y un dataset de volumen para NF-PERF-02.
+```
+[PC del tester / CI]                         [VM DigitalOcean — QA]
+  curl · K6 (clientes) ───── internet ─────►   Snipe-IT + MariaDB
+  generan las peticiones                       (sistema bajo prueba, SUT)
+```
 
----
+- Las herramientas de prueba corren **fuera** de la VM: si el generador de carga corriera dentro, consumiría la CPU/RAM del propio servidor medido (**contaminaría la medición**) y mediría `localhost` sin latencia de red real.
+- En la VM **no se instala ninguna herramienta**: solo vive el SUT (app + BD en Docker).
 
-## 4. Escenarios E2E funcionales
+### 3.2 Herramientas (versiones compartidas)
 
-> Cada escenario es un recorrido completo por la UI. Trazan a los requisitos funcionales (RF) ya diseñados en el Hito 2.
+| Herramienta | Uso | Versión / ejecución |
+|---|---|---|
+| `curl` | Estados HTTP, redirecciones, cabeceras, TTFB individual | nativo (Windows/Linux) |
+| **K6** | **Carga con usuarios virtuales (VUs), percentiles (p95), umbrales** | **`grafana/k6:1.0.0` fijada** — vía Docker: `tests/tests_k6/` (compose + wrapper + README con reglas del grupo) |
 
-| ID | Escenario E2E | Pasos (resumen) | Resultado esperado | RF |
-|----|---------------|-----------------|--------------------|----|
-| E2E-01 | Login válido | `/login` → credenciales admin → Entrar | Redirige al dashboard; sesión iniciada | RF-09 |
-| E2E-02 | Crear activo | Assets → Create → (model, status, tag) → Save | El activo aparece en el listado con su tag | RF-01 |
-| E2E-03 | Checkout de activo | Abrir activo → Checkout → destino usuario → Checkout | Ficha muestra "Checked out to"; estado Deployed | RF-02 |
-| E2E-04 | Checkin de activo | Abrir activo asignado → Checkin → confirmar | Activo disponible; sin asignación | RF-03 |
-| E2E-05 | Crear licencia con N asientos | Licenses → Create → Name+Category+Seats=N → Save | Licencia creada; pestaña Seats con N filas | RF-04 |
-| E2E-06 | Logout | Menú usuario → Logout | Redirige a `/login`; sesión cerrada | RF-09 |
-
-*(Estos escenarios refinan los casos SYS-01/SYS-02 de la v1.0 hacia recorridos E2E automatizables.)*
-
----
-
-## 5. Trazabilidad de niveles (por qué E2E aporta algo distinto)
-
-| Recorrido | Unidad | Integración | **Sistema (E2E)** |
-|-----------|:------:|:-----------:|:-----------------:|
-| Checkout de activo | Método `checkOut()` | POST `hardware/{id}/checkout` (HTTP) | **El usuario navega y confirma en la UI real desplegada** |
-
-E2E valida lo que los niveles inferiores no pueden: **render de la UI, JavaScript (select2, datatables), sesión/cookies y el sistema realmente desplegado**.
+### 3.3 Reglas de ejecución del grupo
+1. K6 siempre desde la PC del tester (o CI), **nunca dentro de la VM**.
+2. **Scripts de desempeño = endpoints de solo lectura** (no llenan la BD); si se prueba escritura, planificar limpieza.
+3. No elevar la carga (>5 VUs) ni ejecutar K6 durante una sesión de caja negra de otro compañero, sin coordinar.
 
 ---
 
-## 6. Selección de pruebas NO funcionales y su fundamentación
+## 4. Selección de los DOS atributos oficiales y fundamentación
 
-> **Actualización v2.1 (indicación del docente para la presentación final):** el nivel de sistema debe aplicar **solo DOS atributos**. Se declaran como **atributos OFICIALES: Seguridad y Desempeño (rendimiento)** — los dos de mayor riesgo en la matriz §6.1 y los que cuentan con **evidencia real ejecutada**. La **Fiabilidad**, planificada originalmente como tercera característica, se mantiene únicamente como *verificación complementaria ya ejecutada* (NF-REL-02), fuera del alcance oficial.
+> Indicación del docente: *"tomar/aplicar solo dos atributos (ej. seguridad, desempeño, concurrencia, disponibilidad, usabilidad)"*. Selección por **riesgo** (probabilidad × impacto) sobre **ISO/IEC 25010**:
 
-> Fundamento de la selección: por **riesgo** (ISO 29119 no exige probar todos los atributos: se prioriza por *probabilidad × impacto*), sobre el modelo de calidad **ISO/IEC 25010** y por su **observabilidad a nivel de sistema**.
+| Característica (25010) | Riesgo | Decisión |
+|---|---|---|
+| **Seguridad** | 🔴 Alto — datos de activos/usuarios, auth, permisos, FMCS, superficie web pública | ✅ **Atributo oficial 1** |
+| **Desempeño (eficiencia)** | 🔴 Alto — datatables e inventarios crecientes; medible objetivamente; ahora incluye **concurrencia** vía K6 | ✅ **Atributo oficial 2** |
+| Fiabilidad | 🟠 Medio | ➖ Complementaria (ya ejecutada, se reporta como adicional) |
+| Usabilidad / Compatibilidad / Portabilidad | 🟢 Bajo (UI madura; web estándar; Docker) | ❌ Fuera |
+| Mantenibilidad | — | ❌ Se evalúa por cobertura unitaria (Hito 2, 85 %) |
 
-### 6.1 Matriz de riesgo (ISO 25010 × riesgo)
-
-| Característica (ISO 25010) | Probabilidad de fallo | Impacto | Riesgo | Decisión |
-|---------------------------|-----------------------|---------|--------|----------|
-| **Seguridad** | Media-Alta — auth, permisos, FMCS, multiusuario, datos sensibles, superficie web | **Alto** — fuga/alteración de datos | 🔴 **ALTO** | ✅ **Incluir** |
-| **Rendimiento (eficiencia)** | Media — datatables, inventarios grandes, reportes | **Alto** — degrada la UX y el uso real | 🔴 **ALTO** | ✅ **Incluir** |
-| **Fiabilidad** | Media — throttling de login configurado, manejo de errores | Medio | 🟠 **MEDIO** | ✅ **Incluir** |
-| Usabilidad | Baja-Media — UI madura (AdminLTE) | Bajo-Medio | 🟡 Bajo-Medio | ➖ Se documenta, no se prioriza |
-| Compatibilidad | Baja — web estándar; BD ya cubierta por CI | Bajo | 🟢 Bajo | ❌ Fuera |
-| Portabilidad | Baja — Docker la resuelve | Bajo | 🟢 Bajo | ❌ Fuera |
-| Mantenibilidad | Se valida a nivel **unidad/cobertura** (Hito 2, 85 %) | — | — | ❌ Otro nivel |
-
-### 6.2 Fundamentación (por qué estas tres)
-
-1. **Seguridad — la de mayor impacto.** Snipe-IT gestiona **activos, licencias y datos de usuarios** con control de acceso por **políticas** y **multiempresa (FMCS)**. Un fallo compromete confidencialidad/integridad. El propio proyecto ya prioriza seguridad en su CI (**CodeQL**, **EthicalCheck**), lo que confirma que es un riesgo de primer orden.
-2. **Rendimiento — alto impacto en el uso real.** El sistema se apoya en **datatables** y listados que crecen con el inventario; tiempos de respuesta pobres degradan la operación. Es **medible objetivamente** a nivel de sistema.
-3. **Fiabilidad — riesgo medio, verificable y relevante.** La app tiene **throttling de login configurable** (`LOGIN_MAX_ATTEMPTS`/`LOGIN_LOCKOUT_DURATION`, RF-09/CPF-12.2) y páginas de error; verificar el bloqueo tras N intentos y el manejo de errores valida la robustez ante uso adverso.
-
-Se **descartan** Compatibilidad y Portabilidad (bajo riesgo: web estándar sobre Docker; además la compatibilidad de BD ya se ejercita en el CI) y **Mantenibilidad** (se evalúa por **cobertura unitaria**, ya lograda en el Hito 2). Esta selección focalizada cumple el principio de **pruebas basadas en riesgo** de ISO 29119: cobertura donde el riesgo lo justifica, sin dispersión.
-
-### 6.3 Casos no funcionales
-
-| ID | Característica | Caso | Método / Umbral | Resultado esperado |
-|----|---------------|------|-----------------|--------------------|
-| NF-SEC-01 | Seguridad | Acceso a ruta protegida sin sesión (`/hardware`) | Petición HTTP sin autenticar | **302 → `/login`**; no expone datos |
-| NF-SEC-02 | Seguridad | Acción sin permiso (usuario limitado) | E2E/HTTP a acción no autorizada | **403** / botón ausente |
-| NF-SEC-03 | Seguridad | Logout invalida la sesión | E2E: logout → volver a ruta protegida | Redirige a login (sesión inválida) |
-| NF-PERF-01 | Rendimiento | Tiempo de carga de páginas clave (login, dashboard, listado) | Medición HTTP (TTFB) en staging | **< 2 s** por página |
-| NF-PERF-02 | Rendimiento | Listado de activos con volumen (≈500 registros) | Medición con dataset sembrado | Respuesta **< 3 s** |
-| NF-REL-01 | Fiabilidad | Throttling de login | N+1 intentos fallidos (`LOGIN_MAX_ATTEMPTS`) | **Bloqueo/lockout** tras el umbral |
-| NF-REL-02 | Fiabilidad | Manejo de ruta inexistente | GET a URL inexistente | **404 controlado** (sin stacktrace) |
+**Fundamentación:** (1) **Seguridad** es el atributo de mayor impacto: Snipe-IT gestiona activos, licencias y usuarios con control de acceso por políticas y multiempresa; el propio proyecto la prioriza en CI (CodeQL). (2) **Desempeño** es el atributo con mayor efecto en la operación diaria y el único plenamente **cuantificable** a nivel de sistema; con **K6** se añade la dimensión de **carga concurrente** (VUs, p95, tasa de error), superando la medición puntual de `curl`. Esta selección focalizada aplica el principio de **pruebas basadas en riesgo** de ISO 29119.
 
 ---
 
-## 7. Entorno y dependencias
+## 5. Casos de prueba de sistema (especificación)
+
+### 5.1 Atributo oficial 1 — SEGURIDAD
+
+| ID | Caso | Método | Resultado esperado |
+|----|------|--------|--------------------|
+| NF-SEC-01 | Ruta protegida sin sesión (`/hardware`, `/`) | `curl` sin autenticar contra la URL QA | **302 → `/login`**; sin exponer datos |
+| NF-SEC-hdr | Cabeceras de seguridad en `/login` | `curl -D` | `X-Frame-Options: DENY` · `X-Content-Type-Options: nosniff` · `Referrer-Policy` · cookie `httponly/samesite` · token CSRF |
+| NF-SEC-02 | Acción sin permiso (usuario limitado) | Navegador/HTTP autenticado como `alimitada` | **403** / control ausente |
+| NF-SEC-03 | Logout invalida la sesión | Navegador: logout → volver a ruta protegida | Redirige a login |
+
+### 5.2 Atributo oficial 2 — DESEMPEÑO
+
+| ID | Caso | Método | Umbral |
+|----|------|--------|--------|
+| NF-PERF-01 | Latencia individual de páginas clave | `curl -w` (TTFB) contra la URL QA | **< 2 s** |
+| NF-PERF-K6-smoke | Carga base (validación del entorno de medición) | K6: 5 VUs × 30 s | p95 < 2000 ms · errores < 1 % |
+| **NF-PERF-K6-1** | **Configuración mínima 1** | **K6: 20 VUs × 30 s** | p95 < 2000 ms · errores < 1 % |
+| **NF-PERF-K6-2** | **Configuración mínima 2** | **K6: 50 VUs × 45 s** | p95 < 2000 ms · errores < 1 % |
+| **NF-PERF-K6-3** | **Configuración mínima 3** | **K6: 100 VUs × 60 s** | p95 < 2000 ms · errores < 1 % |
+| **NF-PERF-K6-R** | **Escenario adicional de proyecto real: RAMPA** (llegada escalonada del personal: 0→20→50→100→0 VUs, 30 s/tramo) | K6 `ramping-vus` | p95 < 2000 ms · errores < 1 % |
+| NF-PERF-02 | Listado con volumen (≈500 activos) | Medición con dataset sembrado | < 3 s |
+
+> Por escenario se registran: **iteraciones, tiempo promedio, tiempo máximo, throughput (req/s), solicitudes exitosas, fallidas y % de errores** (requisito del docente), más p95 para el umbral. Script único parametrizado: `tests/tests_k6/k6-perfil-carga.js` (variable `PERFIL`). Escenario adicional justificado: en producción la carga **no aparece de golpe** — la rampa modela el patrón diario real de un sistema interno; alternativas documentadas: *spike* y *soak*.
+
+### 5.3 Complementarias (fuera del alcance oficial, ya ejecutadas)
+
+| ID | Atributo | Caso | Esperado |
+|----|----------|------|----------|
+| NF-REL-01 | Fiabilidad | Throttling de login (N+1 intentos) | Lockout tras el umbral |
+| NF-REL-02 | Fiabilidad | Ruta inexistente | **404 controlado** sin stacktrace |
+
+---
+
+## 6. Entorno y dependencias
 
 | Elemento | Configuración |
 |----------|---------------|
-| Despliegue | `docker compose up -d` (app + MariaDB) → `http://localhost:8000` (staging) |
-| Herramienta E2E | Laravel Dusk + ChromeDriver (headless en CI) |
-| Datos | Seeders/factories (admin, catálogos; dataset de volumen para NF-PERF-02) |
-| CI/CD | GitHub Actions: job E2E que levanta el contenedor y ejecuta Dusk (evidencia del despliegue automatizado) |
-| Medición NF | `curl -w` (tiempos/estados), revisión de cabeceras HTTP |
+| **Entorno QA oficial (SUT)** | VM DigitalOcean — Ubuntu 24.04 · 1 vCPU · 1 GB RAM · 25 GB SSD — Docker Compose (Snipe-IT + MariaDB 11.4.7) → `http://159.223.135.124/` |
+| Acceso administrativo | SSH con clave privada (PowerShell/OpenSSH); clave y credenciales **fuera del repositorio** (`.gitignore`), por canal privado del grupo |
+| Cliente de carga | K6 `1.0.0` vía Docker en la PC del tester (`k6/docker-compose.k6.yml` + `correr-k6.ps1`) |
+| Datos | Los mismos datos QA de los guiones (RF-02…RF-11); los scripts K6 usan **solo lectura** |
+| Entorno local (secundario) | `docker compose up -d` → `localhost:8000`, solo desarrollo/preparación |
+| CI/CD | GitHub Actions (suites por push); job E2E como plus (Anexo A) |
 
 ---
 
-## 8. Criterios de entrada y salida
+## 7. Criterios de entrada y salida
 
 ### Entrada
-- [ ] App desplegada y accesible en staging (Docker).
-- [ ] Dusk instalado (`composer require --dev laravel/dusk`) y ChromeDriver disponible.
-- [ ] Usuario admin y catálogos sembrados.
+- [x] Entorno QA en nube desplegado, accesible y con datos cargados.
+- [x] Entorno K6 compartido con versión fijada (`1.0.0`) disponible para el grupo.
 
 ### Salida
-- [ ] E2E-01…E2E-06 ejecutados; 0 fallos bloqueantes.
-- [ ] NF-SEC/PERF/REL ejecutados; umbrales cumplidos o desviaciones registradas como incidentes.
-- [ ] Defectos en GitHub Issues; resultados en el **Informe de Pruebas de Sistema**.
+- [ ] Casos de Seguridad (NF-SEC-*) ejecutados contra la URL QA; sin defectos altos abiertos.
+- [ ] Casos de Desempeño (NF-PERF-01, **NF-PERF-K6**) ejecutados contra la URL QA; umbrales cumplidos.
+- [ ] Desviaciones registradas como incidentes (GitHub Issues) y resultados en el **Informe**.
 
 ---
 
-## 9. Riesgos
+## 8. Riesgos
 
 | ID | Riesgo | Mitigación |
 |----|--------|------------|
-| RS-01 | E2E frágiles ante cambios de UI (selectores) | Selectores estables (`@dusk`, ids), no textos volátiles |
-| RS-02 | Dependencia de ChromeDriver/entorno gráfico | Ejecutar headless; fijar versión de Chrome en CI |
-| RS-03 | Tiempos de rendimiento dependientes de la máquina | Medir en el entorno CI/staging estándar; reportar percentiles |
-| RS-04 | Datos residuales entre corridas | BD de prueba dedicada / reseteo por corrida |
+| RS-01 | Medición contaminada por correr el generador dentro del SUT | **Prohibido**: K6 siempre externo (§3.1) |
+| RS-02 | Tiempos dependientes de la red del tester | Reportar percentiles (p95) y n.º de muestras; misma versión K6 para todos |
+| RS-03 | Datos residuales de pruebas | Scripts K6 de **solo lectura**; escritura solo con plan de limpieza |
+| RS-04 | Sesiones simultáneas del grupo interfieren | Coordinar: no correr K6 durante caja negra manual de otro integrante |
+| RS-05 | VM de 1 GB se degrada bajo carga alta | Carga oficial = smoke (5 VUs); estrés solo coordinado, con swap/resize previo |
+| RS-06 | Caída del entorno QA cerca de la sustentación | Verificar 2 días antes; plan B: túnel `cloudflared` sobre Docker local |
 
 ---
 
-## 10. Trazabilidad
+## 9. Trazabilidad
 
-Los escenarios **E2E-0X** trazan a los **RF-XX** y a los casos funcionales **CPF-XX** (Matriz de Trazabilidad). Los casos **NF-*** trazan a atributos de **ISO/IEC 25010**.
+Los casos NF-SEC-* y NF-PERF-* trazan al atributo correspondiente de **ISO/IEC 25010** y a los requisitos de calidad del sistema; la validación funcional traza vía CPF-XX/INT-XX en la [Matriz de Trazabilidad](Matriz-de-Trazabilidad).
 
 ---
 
-## Anexo A — Esqueleto de un test E2E en Laravel Dusk
+## Anexo A — Automatización E2E (plus opcional, no prioritario)
 
-```php
-// tests/Browser/CheckoutAssetE2ETest.php
-class CheckoutAssetE2ETest extends DuskTestCase
-{
-    public function test_e2e_03_checkout_de_activo_a_usuario(): void
-    {
-        $this->browse(function (Browser $browser) {
-            $browser->visit('/login')
-                    ->type('username', 'admin')
-                    ->type('password', 'secret')
-                    ->press('Login')
-                    ->assertPathIs('/')                 // dashboard
-                    ->visit('/hardware')                // listado
-                    ->clickLink('QA-A-001')             // abrir activo
-                    ->clickLink('Checkout')
-                    ->select('checkout_to_type', 'user')
-                    ->type('assigned_user', 'jperez')
-                    ->press('Checkout')
-                    ->assertSee('Checked out');         // verificación E2E
-        });
-    }
-}
-```
+> El docente indicó que la automatización E2E **"ya no es prioridad"** (plus). Se conserva aquí lo implementado, con su estado transparente.
+
+### A.1 Escenarios E2E diseñados (recorridos por navegador)
+
+| ID | Escenario | RF |
+|----|-----------|----|
+| E2E-01 / 01b | Login válido / inválido | RF-09 |
+| E2E-02 | Activo visible en la UI | RF-01 |
+| E2E-03 | La UI ofrece checkout de activo disponible | RF-02 |
+| E2E-04 | Checkin de activo | RF-03 |
+| E2E-05 | Crear licencia con N asientos | RF-04 |
+| E2E-06 | Logout | RF-09 |
+
+### A.2 Implementación y estado
+
+- **Herramienta:** Laravel Dusk (navegador Chrome real) — elegida por el stack PHP/Laravel (equivalente de Cypress/Playwright).
+- **Código:** `tests/Browser/AuthenticationE2ETest.php`, `tests/Browser/AssetE2ETest.php`.
+- **Infraestructura:** `trabajoLibelula/HITO-3/Sistema/docker-compose.e2e.yml` (Selenium/Chrome + app + MariaDB, red interna) y workflow CI `.github/workflows/e2e-dusk.yml` (runner Linux).
+- **Estado:** stack verificado (levanta; Dusk conecta al navegador); **corrida verde pendiente** — la primera ejecución en CI falló y está en estabilización. En local (Windows) está bloqueada por el rendimiento del bind-mount de Docker. **No es exigible** para la presentación final.
+- ⚠️ Dusk **trunca la base de datos**: jamás apuntarlo al entorno QA compartido con los datos de la sustentación; solo a BD desechables.
 
 ---
 
@@ -194,9 +193,12 @@ class CheckoutAssetE2ETest extends DuskTestCase
 | Versión | Fecha | Cambios |
 |---------|-------|---------|
 | 1.0 | 2026-06-12 | Plan inicial (categorías SYS-01…SYS-07). |
-| 2.0 | 2026-07-08 | Refinado a **E2E automatizado (Laravel Dusk)**; selección **no-funcional basada en riesgo** (ISO 25010): 3 características (Seguridad, Rendimiento, Fiabilidad) fundamentadas; escenarios E2E-01…06 y casos NF-*; entorno staging Docker + CI. |
-| 2.1 | 2026-07-09 | Ajuste a la indicación final del docente: **dos atributos oficiales** (Seguridad + Desempeño); Fiabilidad pasa a verificación complementaria. El E2E deja de ser prioritario (plus opcional según el docente); se recomienda **K6** para el atributo Desempeño. |
+| 2.0 | 2026-07-08 | Refinado a E2E automatizado + selección no-funcional por riesgo (3 características). |
+| 2.1 | 2026-07-09 | Dos atributos oficiales (Seguridad + Desempeño) por indicación del docente; E2E reclasificado plus. |
+| 2.2 | 2026-07-09 | Entorno de staging oficial migrado a la nube (VM DigitalOcean). |
+| **3.0** | 2026-07-09 | **Reestructuración completa**: atributos oficiales + **K6 (`1.0.0` fijada, cliente externo)** como núcleo del plan, todo contra el entorno QA en nube; caso **NF-PERF-K6** (5 VUs × 30 s); reglas de ejecución del grupo; riesgos RS-01…06; **E2E desplazado al Anexo A** (plus opcional). |
+| 3.1 | 2026-07-09 | **Perfiles de carga oficiales del docente** (NF-PERF-K6-1/2/3: 20×30 s, 50×45 s, 100×60 s) + **escenario adicional de proyecto real NF-PERF-K6-R (rampa)** con justificación; métricas de registro por escenario (iteraciones, promedio, máximo, throughput, exitosas/fallidas, % errores). |
 
 ---
 
-*Fin del documento — Plan de Pruebas de Sistema (E2E). Ejecución y resultados en el Informe.*
+*Fin del documento — Plan de Pruebas de Sistema. Resultados en el Informe.*

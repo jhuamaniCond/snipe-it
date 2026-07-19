@@ -1,0 +1,23 @@
+# =============================================================================
+# Entorno COMPARTIDO de pruebas de desempeño con K6 (versión fijada).
+# Todo el grupo ejecuta con la MISMA versión de K6 → resultados comparables.
+#
+# K6 corre como CLIENTE (generador de carga) FUERA del servidor bajo prueba:
+# esta PC genera los usuarios virtuales y ataca la URL del entorno QA en nube
+# (http://159.223.135.124). NUNCA instalar/ejecutar K6 dentro de la VM.
+#
+# Uso (desde la RAÍZ del repo, con Docker Desktop abierto):
+#   docker compose -f tests/tests_k6/docker-compose.k6.yml run --rm k6
+#
+# Ejecutar otro script de la carpeta:
+#   docker compose -f tests/tests_k6/docker-compose.k6.yml run --rm k6 run /scripts/otro-script.js
+# =============================================================================
+services:
+  k6:
+    # Versión FIJADA (pin) — no usar :latest para que todos midan igual.
+    image: grafana/k6:1.0.0
+    volumes:
+      # Monta esta carpeta (los scripts .js) dentro del contenedor.
+      - ./:/scripts
+    # Por defecto corre la prueba de desempeño oficial (NF-PERF).
+    command: run /scripts/k6-desempeno.js
