@@ -1,11 +1,11 @@
 # Informe de Pruebas de Sistema
 
-> **Test Completion Report** conforme a **ISO/IEC/IEEE 29119-3**. Reporta la ejecución del [Plan de Pruebas de Sistema](Plan-de-Pruebas-de-Sistema) v3.0: **dos atributos oficiales (Seguridad y Desempeño)** verificados sobre el **entorno QA compartido en la nube**, con `curl` y **K6**. La automatización E2E (plus opcional) se reporta en el Anexo A.
+> **Test Completion Report** conforme a **ISO/IEC/IEEE 29119-3**. Reporta la ejecución del [Plan de Pruebas de Sistema](Plan-de-Pruebas-de-Sistema) v3.2: **dos atributos oficiales (Seguridad y Desempeño)** verificados sobre el **entorno QA compartido en la nube**, con `curl` y **K6**.
 
 | Campo | Detalle |
 |-------|---------|
 | **Documento** | Informe de Pruebas de Sistema — Snipe-IT |
-| **Versión** | 2.1 |
+| **Versión** | 2.2 |
 | **Hito / Sprint** | Hito 3 (Sprint 3–4) |
 | **Atributos oficiales** | **Seguridad** y **Desempeño** (ISO/IEC 25010) |
 | **Entorno QA oficial (SUT)** | VM DigitalOcean — Ubuntu 24.04 · 1 vCPU · 1 GB RAM — Docker Compose (Snipe-IT + MariaDB 11.4.7) → `http://159.223.135.124/` |
@@ -29,7 +29,7 @@ Se verificó el sistema **desplegado en la nube** (URL pública compartida por e
 
 ## 2. Base de la prueba
 
-- **Plan de referencia:** [Plan de Pruebas de Sistema](Plan-de-Pruebas-de-Sistema) v3.0 (dos atributos por indicación del docente; selección por riesgo ISO 25010).
+- **Plan de referencia:** [Plan de Pruebas de Sistema](Plan-de-Pruebas-de-Sistema) v3.2 (dos atributos por indicación del docente; selección por riesgo ISO 25010).
 - **Trazabilidad:** NF-* → atributos ISO 25010; la validación funcional del sistema quedó cubierta por los CPF (caja negra manual, Hito 2) e INT (integración, Hito 3) — [Matriz de Trazabilidad](Matriz-de-Trazabilidad).
 
 ---
@@ -42,7 +42,6 @@ Se verificó el sistema **desplegado en la nube** (URL pública compartida por e
 | **Desempeño** — NF-PERF-01 (curl) + **NF-PERF-K6 (carga)** contra la URL QA | ✅ Ejecutado (real) |
 | Complementaria — NF-REL-02 (fiabilidad) | ✅ Ejecutado (real) |
 | NF-SEC-02/03 (403 autenticado, logout) · NF-PERF-02 (volumen) · NF-REL-01 (throttling) | 🕗 Pendientes |
-| E2E automatizado (plus opcional) | Ver **Anexo A** |
 
 ---
 
@@ -157,31 +156,16 @@ Se verificó el sistema **desplegado en la nube** (URL pública compartida por e
 2. **K6 aportó la dimensión que faltaba** (concurrencia): la medición pasó de tomas puntuales (`curl`) a carga sostenida con percentiles y umbrales verificables — con **versión fijada (1.0.0)** para que todo el grupo mida igual.
 3. **La arquitectura de medición es correcta**: cliente de carga externo al SUT, scripts de solo lectura (no contaminan la BD del entorno compartido), resultados interpretados relativos al hardware declarado.
 4. **Trabajo restante (menor):** NF-SEC-02/03, NF-PERF-02 (dataset de volumen) y NF-REL-01; opcionalmente un perfil de carga mayor coordinado (con swap/resize previo de la VM).
-5. La automatización **E2E** queda como plus opcional documentado con transparencia (Anexo A).
 
 ---
 
-## Anexo A — Automatización E2E (plus opcional, no prioritario)
+## Anexo — Evidencias y artefactos
 
-> Indicación del docente: la automatización E2E *"ya no es prioridad"*. Se reporta lo implementado con su estado real, **sin darlo por aprobado**.
-
-| Aspecto | Estado |
-|---------|--------|
-| Código E2E (Laravel Dusk): `tests/Browser/AuthenticationE2ETest.php`, `AssetE2ETest.php` (5 casos: login válido/inválido, logout, activo visible, checkout ofrecido) | ✅ Implementado |
-| Infraestructura Docker: `docker-compose.e2e.yml` (Selenium/Chrome headless + app + MariaDB, red interna) | ✅ Verificada (stack levanta; Dusk conecta y ejecuta) |
-| Workflow CI: `.github/workflows/e2e-dusk.yml` (runner Linux; sube capturas si falla) | ✅ Creado |
-| **Corrida verde (aserciones)** | ❌ **Aún no** — la primera corrida en CI falló (2026-07-08); en local (Windows) el bind-mount de Docker impide servir la app de forma fiable al navegador (`ERR_CONNECTION_REFUSED`). En estabilización; **no exigible** |
-| Precaución | Dusk **trunca la BD**: nunca apuntarlo al entorno QA compartido; solo a BD desechables |
-
----
-
-## Anexo B — Evidencias y artefactos
-
-- `HITO-3/Sistema/Evidencias/RESULTADO-K6-DESEMPENO.md` — salida íntegra de la corrida K6 (5 VUs × 30 s) contra la nube.
+- `HITO-3/Sistema/Evidencias/RESULTADO-K6-PERFILES-CARGA.md` — perfiles de carga oficiales (20/50/100 VUs + rampa) con métricas e interpretación.
+- `HITO-3/Sistema/Evidencias/RESULTADO-K6-DESEMPENO.md` — corrida base de K6 (5 VUs × 30 s) contra la nube.
 - `HITO-3/Sistema/Evidencias/RESULTADO-NO-FUNCIONALES-HTTP.md` — mediciones `curl` (staging local 2026-07-08 y nube 2026-07-09).
-- `tests/tests_k6/` — entorno K6 compartido (compose con pin `1.0.0`, wrapper, script oficial, README con reglas).
-- `tests/Browser/`, `HITO-3/Sistema/docker-compose.e2e.yml`, `.github/workflows/e2e-dusk.yml` — plus E2E (Anexo A).
-- Plan de referencia: `Plan-de-Pruebas-de-Sistema.md` v3.0.
+- `tests/tests_k6/` — entorno K6 compartido (compose con pin `1.0.0`, wrapper, scripts oficiales, README con reglas).
+- Plan de referencia: `Plan-de-Pruebas-de-Sistema.md` v3.2.
 
 ---
 
@@ -195,5 +179,6 @@ Se verificó el sistema **desplegado en la nube** (URL pública compartida por e
 | 1.4 | 2026-07-09 | Migración del staging a la nube y re-ejecución `curl` contra la URL pública. |
 | **2.0** | 2026-07-09 | **Reestructuración**: resultados organizados por atributo oficial contra el entorno QA en nube; **primera corrida real de K6** (5 VUs × 30 s: p95 690 ms, 0 % errores — PASS); observaciones de capacidad; **E2E desplazado al Anexo A**. |
 | 2.1 | 2026-07-09 | **Perfiles de carga oficiales ejecutados** (20×30 s ✅ límite · 50×45 s ❌ · 100×60 s ❌ · rampa ❌) con las métricas exigidas por escenario e **interpretación**: 0 % errores en ~1 900 peticiones (degradación elegante), saturación ≈ 20 VUs / 8.5 req/s, hallazgo de **capacidad del hardware** (no defecto del software). |
+| 2.2 | 2026-07-19 | **E2E retirado del informe** (decisión del grupo en la revisión final): se elimina el Anexo A y sus referencias; el informe queda acotado a los dos atributos oficiales ejecutados sobre la nube. |
 
 *Fin del documento — Informe de Pruebas de Sistema.*

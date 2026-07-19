@@ -1,11 +1,11 @@
 # Plan de Pruebas de Sistema
 
-> Conforme a **ISO/IEC/IEEE 29119-3**. Nivel de **Sistema** del Modelo-V: **verificación** del sistema completo **desplegado**, desde su interfaz externa. Alcance oficial según la indicación final del docente: **dos atributos no funcionales** — **Seguridad y Desempeño** — ejecutados sobre el **entorno QA compartido en la nube**. La automatización E2E queda como **plus opcional** (Anexo A). Los resultados se reportan en el [Informe de Pruebas de Sistema](Informe-de-Pruebas-de-Sistema).
+> Conforme a **ISO/IEC/IEEE 29119-3**. Nivel de **Sistema** del Modelo-V: **verificación** del sistema completo **desplegado**, desde su interfaz externa. Alcance oficial según la indicación final del docente: **dos atributos no funcionales** — **Seguridad y Desempeño** — ejecutados sobre el **entorno QA compartido en la nube**. Los resultados se reportan en el [Informe de Pruebas de Sistema](Informe-de-Pruebas-de-Sistema).
 
 | Campo | Detalle |
 |-------|---------|
 | **Documento** | Plan de Pruebas de Sistema — Snipe-IT |
-| **Versión** | 3.0 (reestructurado: atributos oficiales al núcleo, E2E al Anexo) |
+| **Versión** | 3.2 (alcance definitivo: solo atributos oficiales; E2E retirado del plan) |
 | **Hito / Sprint** | Hito 3 (Sprint 3–4) |
 | **Nivel de prueba** | Sistema (caja negra sobre el sistema desplegado) |
 | **Atributos oficiales** | **Seguridad** y **Desempeño** (ISO/IEC 25010, selección por riesgo) |
@@ -37,7 +37,7 @@ Las pruebas de sistema validan el **producto completo desplegado** desde su inte
 - Funcionalidad interna (cubierta por unitarias/integración) y validación funcional por UI (cubierta por los CPF de caja negra manual).
 - Estrés a gran escala (la VM QA es compartida, 1 vCPU/1 GB; ver riesgos RS-05/RS-06).
 - Integraciones externas reales (LDAP/SAML/MTA).
-- **E2E automatizado**: reclasificado como **plus opcional** por el docente → **Anexo A**.
+- **Automatización E2E por navegador**: retirada del alcance de este plan (el docente la declaró no prioritaria); la validación funcional del sistema queda cubierta por los CPF de caja negra manual y la UAT de aceptación.
 
 ---
 
@@ -124,10 +124,10 @@ Las pruebas de sistema validan el **producto completo desplegado** desde su inte
 |----------|---------------|
 | **Entorno QA oficial (SUT)** | VM DigitalOcean — Ubuntu 24.04 · 1 vCPU · 1 GB RAM · 25 GB SSD — Docker Compose (Snipe-IT + MariaDB 11.4.7) → `http://159.223.135.124/` |
 | Acceso administrativo | SSH con clave privada (PowerShell/OpenSSH); clave y credenciales **fuera del repositorio** (`.gitignore`), por canal privado del grupo |
-| Cliente de carga | K6 `1.0.0` vía Docker en la PC del tester (`k6/docker-compose.k6.yml` + `correr-k6.ps1`) |
+| Cliente de carga | K6 `1.0.0` vía Docker en la PC del tester (`tests/tests_k6/docker-compose.k6.yml` + `correr-k6.ps1`) |
 | Datos | Los mismos datos QA de los guiones (RF-02…RF-11); los scripts K6 usan **solo lectura** |
 | Entorno local (secundario) | `docker compose up -d` → `localhost:8000`, solo desarrollo/preparación |
-| CI/CD | GitHub Actions (suites por push); job E2E como plus (Anexo A) |
+| CI/CD | GitHub Actions (suites de pruebas por push) |
 
 ---
 
@@ -163,31 +163,6 @@ Los casos NF-SEC-* y NF-PERF-* trazan al atributo correspondiente de **ISO/IEC 2
 
 ---
 
-## Anexo A — Automatización E2E (plus opcional, no prioritario)
-
-> El docente indicó que la automatización E2E **"ya no es prioridad"** (plus). Se conserva aquí lo implementado, con su estado transparente.
-
-### A.1 Escenarios E2E diseñados (recorridos por navegador)
-
-| ID | Escenario | RF |
-|----|-----------|----|
-| E2E-01 / 01b | Login válido / inválido | RF-09 |
-| E2E-02 | Activo visible en la UI | RF-01 |
-| E2E-03 | La UI ofrece checkout de activo disponible | RF-02 |
-| E2E-04 | Checkin de activo | RF-03 |
-| E2E-05 | Crear licencia con N asientos | RF-04 |
-| E2E-06 | Logout | RF-09 |
-
-### A.2 Implementación y estado
-
-- **Herramienta:** Laravel Dusk (navegador Chrome real) — elegida por el stack PHP/Laravel (equivalente de Cypress/Playwright).
-- **Código:** `tests/Browser/AuthenticationE2ETest.php`, `tests/Browser/AssetE2ETest.php`.
-- **Infraestructura:** `trabajoLibelula/HITO-3/Sistema/docker-compose.e2e.yml` (Selenium/Chrome + app + MariaDB, red interna) y workflow CI `.github/workflows/e2e-dusk.yml` (runner Linux).
-- **Estado:** stack verificado (levanta; Dusk conecta al navegador); **corrida verde pendiente** — la primera ejecución en CI falló y está en estabilización. En local (Windows) está bloqueada por el rendimiento del bind-mount de Docker. **No es exigible** para la presentación final.
-- ⚠️ Dusk **trunca la base de datos**: jamás apuntarlo al entorno QA compartido con los datos de la sustentación; solo a BD desechables.
-
----
-
 ## Historial de cambios
 
 | Versión | Fecha | Cambios |
@@ -198,6 +173,7 @@ Los casos NF-SEC-* y NF-PERF-* trazan al atributo correspondiente de **ISO/IEC 2
 | 2.2 | 2026-07-09 | Entorno de staging oficial migrado a la nube (VM DigitalOcean). |
 | **3.0** | 2026-07-09 | **Reestructuración completa**: atributos oficiales + **K6 (`1.0.0` fijada, cliente externo)** como núcleo del plan, todo contra el entorno QA en nube; caso **NF-PERF-K6** (5 VUs × 30 s); reglas de ejecución del grupo; riesgos RS-01…06; **E2E desplazado al Anexo A** (plus opcional). |
 | 3.1 | 2026-07-09 | **Perfiles de carga oficiales del docente** (NF-PERF-K6-1/2/3: 20×30 s, 50×45 s, 100×60 s) + **escenario adicional de proyecto real NF-PERF-K6-R (rampa)** con justificación; métricas de registro por escenario (iteraciones, promedio, máximo, throughput, exitosas/fallidas, % errores). |
+| 3.2 | 2026-07-19 | **E2E retirado del plan** (decisión del grupo en la revisión final, en línea con el docente): se elimina el Anexo A y toda referencia; el alcance queda exclusivamente en los dos atributos oficiales. La validación funcional del sistema se cubre con CPF (caja negra manual) y UAT (aceptación). |
 
 ---
 
