@@ -1,90 +1,98 @@
 # Plan de Pruebas de Aceptación
 
-> Conforme a ISO/IEC/IEEE 29119-3. Corresponde al **Hito 3 / Sprint 3-4**.
+> Conforme a **ISO/IEC/IEEE 29119-3**. Nivel de **Aceptación** del Modelo-V: **validación** — ¿el sistema satisface las **necesidades del usuario**? Se ejecuta **manualmente**, desde la perspectiva de los roles de negocio, sobre el **entorno QA compartido en la nube**. Los veredictos se registran en el [Informe de Pruebas de Aceptación](Informe-de-Pruebas-de-Aceptacion) (acta).
 
 | Campo | Detalle |
 |-------|---------|
 | **Documento** | Plan de Pruebas de Aceptación — Snipe-IT |
-| **Versión** | 1.0 (planificación) |
-| **Hito / Sprint** | Hito 3 / Sprint 3-4 |
-| **Nivel de prueba** | Aceptación (validación) |
-| **Fecha de elaboración** | 2026-06-12 |
+| **Versión** | 2.0 |
+| **Hito / Sprint** | Hito 3 / Sprint 3–4 |
+| **Nivel de prueba** | Aceptación (UAT — validación por el usuario) |
+| **Herramientas** | **Ninguna adicional**: navegador web sobre el entorno QA (BDD/Gherkin automatizado documentado como opcional, no requerido) |
+| **Entorno UAT** | **Entorno QA compartido en la nube** — VM DigitalOcean (Docker Compose: Snipe-IT + MariaDB) → **http://159.223.135.124/** |
 | **Estándar** | ISO/IEC/IEEE 29119-3 |
+| **Fecha** | 2026-06-12 · última revisión 2026-07-09 (v2.0) |
 
 ---
 
 ## 1. Introducción y objetivos
 
-Las pruebas de aceptación determinan si el sistema **satisface las necesidades del usuario** y los criterios definidos para considerar el producto "aceptado". Adoptan la perspectiva del **usuario/stakeholder** y se expresan mediante **criterios de aceptación** verificables, no mediante detalles técnicos.
+Las pruebas de aceptación determinan si el sistema **satisface las necesidades del usuario** y los criterios definidos para considerar el producto "aceptado". A diferencia del nivel de sistema (**verificación** contra la especificación), la aceptación es **validación**: adopta la perspectiva del **usuario/stakeholder** y se expresa mediante **criterios de aceptación** verificables (Dado–Cuando–Entonces), no mediante detalles técnicos.
 
 **Objetivos:**
 1. Validar que los flujos de negocio aportan el valor esperado al usuario final.
-2. Confirmar el cumplimiento de los criterios de aceptación de las historias de usuario del backlog.
-3. Emitir el veredicto de aceptación del producto en el contexto del curso.
+2. Confirmar los criterios de aceptación de las historias de usuario del backlog.
+3. Emitir el **acta de aceptación** del producto en el contexto del curso.
 
 ---
 
-## 2. Enfoque
+## 2. Enfoque y procedimiento de ejecución
 
-- **Criterios de aceptación** redactados en formato verificable (Dado–Cuando–Entonces).
-- **Ejecución manual** por un rol que actúa como usuario/stakeholder, sobre el entorno de staging.
-- Trazabilidad directa con las **historias de usuario** registradas en GitHub Issues/Projects.
+- **Criterios de aceptación** en formato verificable (Dado–Cuando–Entonces), trazados a las historias de usuario (GitHub Issues/Projects).
+- **Ejecución manual por roles:** cada criterio lo ejecuta un integrante **actuando como el rol de la historia** (administrador, gestor de licencias, empleado sin permisos), por **navegador**, sobre la URL del entorno QA. No se requieren herramientas adicionales.
+- **Entorno único compartido:** la VM en la nube (Docker Compose interno) garantiza que todos validan el mismo sistema con los mismos datos. Los testers **no instalan nada**.
+- **Registro:** por criterio → captura de pantalla (mostrando la URL del entorno QA) + veredicto **Aceptado / Rechazado** + observación, consignados en el **acta** ([Informe](Informe-de-Pruebas-de-Aceptacion)).
+- **Alcance acotado** (indicación del docente: la aceptación no se exige con rigor): se ejecutan **manualmente 5 criterios núcleo** (ACC-01…04, ACC-06); ACC-05 y ACC-07 se validan por **revisión de evidencia** de niveles inferiores.
+
+### Precondiciones del entorno UAT
+- Instancia QA accesible con datos de demostración (catálogos, activos QA-*).
+- Usuarios por rol creados en la instancia de la nube: administrador del grupo, un usuario destino (p. ej. `jperez`) y un usuario **sin permisos** (p. ej. `alimitada`).
 
 ---
 
 ## 3. Criterios de aceptación por historia de usuario
 
-| ID | Historia de usuario | Criterio de aceptación (Dado–Cuando–Entonces) |
-|----|---------------------|------------------------------------------------|
-| ACC-01 | Como administrador, quiero registrar activos | **Dado** un modelo y un estado, **cuando** registro un activo con tag único, **entonces** aparece en el inventario |
-| ACC-02 | Como administrador, quiero asignar activos a empleados | **Dado** un activo disponible, **cuando** lo asigno a un usuario, **entonces** queda registrado como entregado |
-| ACC-03 | Como administrador, quiero recuperar activos | **Dado** un activo asignado, **cuando** registro su devolución, **entonces** vuelve a estar disponible |
-| ACC-04 | Como gestor de licencias, quiero controlar asientos | **Dado** una licencia con N asientos, **cuando** asigno asientos, **entonces** la disponibilidad se actualiza y no permite exceder N |
-| ACC-05 | Como almacenero, quiero controlar consumibles | **Dado** un consumible con stock, **cuando** lo entrego, **entonces** el stock disminuye y se bloquea al agotarse |
-| ACC-06 | Como responsable de seguridad, quiero control de acceso | **Dado** un usuario sin permisos, **cuando** intenta una acción restringida, **entonces** el sistema la deniega |
-| ACC-07 | Como administrador multiempresa, quiero aislamiento de datos | **Dado** FMCS activo, **cuando** un usuario navega, **entonces** solo ve entidades de su empresa |
+| ID | Historia de usuario | Criterio (Dado–Cuando–Entonces) | Modo de validación | RF |
+|----|---------------------|---------------------------------|--------------------|----|
+| ACC-01 | Como administrador, quiero registrar activos | **Dado** un modelo y un estado, **cuando** registro un activo con tag único, **entonces** aparece en el inventario | 🧑‍💻 **UAT manual** | RF-01 |
+| ACC-02 | Como administrador, quiero asignar activos a empleados | **Dado** un activo disponible, **cuando** lo asigno a un usuario, **entonces** queda registrado como entregado | 🧑‍💻 **UAT manual** | RF-02 |
+| ACC-03 | Como administrador, quiero recuperar activos | **Dado** un activo asignado, **cuando** registro su devolución, **entonces** vuelve a estar disponible | 🧑‍💻 **UAT manual** | RF-03 |
+| ACC-04 | Como gestor de licencias, quiero controlar asientos | **Dado** una licencia con N asientos, **cuando** asigno asientos, **entonces** la disponibilidad se actualiza y no permite exceder N | 🧑‍💻 **UAT manual** | RF-04/05 |
+| ACC-05 | Como almacenero, quiero controlar consumibles | **Dado** un consumible con stock, **cuando** lo entrego, **entonces** el stock disminuye y se bloquea al agotarse | 📋 Revisión de evidencia (INT-05, CPF-09) | RF-06 |
+| ACC-06 | Como responsable de seguridad, quiero control de acceso | **Dado** un usuario sin permisos, **cuando** intenta una acción restringida, **entonces** el sistema la deniega | 🧑‍💻 **UAT manual** | RF-09 |
+| ACC-07 | Como administrador multiempresa, quiero aislamiento de datos | **Dado** FMCS activo, **cuando** un usuario navega, **entonces** solo ve entidades de su empresa | 📋 Revisión de evidencia (INT-07, CPF-03.7) | RF-02 |
+
+> **Soporte previo (verificación de niveles inferiores):** todos los criterios cuentan con evidencia técnica previa (unitarias 85 %, integración INT-01…13, sistema NF). Esa evidencia **soporta pero no sustituye** la validación UAT: el veredicto de aceptación se emite tras la ejecución manual por roles y queda **exclusivamente en el Informe** (acta), no en este Plan.
 
 ---
 
-## 4. Registro de aceptación
-
-> **Nota:** este Plan planifica los criterios; el **registro definitivo de veredictos y evidencia** se consolida en el [Informe de Pruebas de Aceptación](Informe-de-Pruebas-de-Aceptacion) (acta). La tabla siguiente refleja el **resultado de cierre** ya emitido en dicho acta.
-
-| ID | Criterio | Veredicto | Evidencia | Observación |
-|----|----------|-----------|-----------|-------------|
-| ACC-01 | Activo registrado | ✅ Aceptado | Informe Aceptación §3–§4 (INT-01 · CPF-01/02) | Revalidación E2E-02 por UI pendiente (no bloqueante) |
-| ACC-02 | Activo asignado | ✅ Aceptado | Informe Aceptación §3–§4 (INT-01 · FI-01/02) | Defecto INC-02 detectado y corregido |
-| ACC-03 | Activo recuperado | ✅ Aceptado | Informe Aceptación §3–§4 (INT-02 · FI-03) | Sin doble asignación de estado |
-| ACC-04 | Control de asientos | ✅ Aceptado | Informe Aceptación §3–§4 (INT-04 · CPF-08) | No permite exceder N asientos |
-| ACC-05 | Control de stock | ✅ Aceptado | Informe Aceptación §3–§4 (INT-05) | Bloqueo al agotar stock |
-| ACC-06 | Control de acceso | ✅ Aceptado | Informe Aceptación §3–§4 (NF-SEC-01 · INT-08) | 302 a login sin sesión |
-| ACC-07 | Aislamiento multiempresa | ✅ Aceptado | Informe Aceptación §3–§4 (INT-07 FMCS) | Bloquea entre empresas |
-
-> UAT = *User Acceptance Testing*. Veredicto global del acta: **Producto Aceptado con observación** (revalidación E2E por UI en estabilización). Ver [Informe de Pruebas de Aceptación](Informe-de-Pruebas-de-Aceptacion).
-
----
-
-## 5. Criterios de entrada y salida
-
-> Estado evaluado en el [Informe de Pruebas de Aceptación](Informe-de-Pruebas-de-Aceptacion) §7.
+## 4. Criterios de entrada y salida
 
 ### Entrada
-- [x] Pruebas de sistema del Hito 3 superadas *(no funcionales verdes; revalidación E2E por UI en estabilización — no bloqueante)*.
-- [x] Entorno de staging estable con datos de demostración (app desplegada con Docker Compose).
+- [x] Pruebas de sistema del Hito 3 ejecutadas (atributos oficiales verdes).
+- [x] Entorno QA en nube estable con datos de demostración.
 - [x] Historias de usuario y criterios de aceptación acordados.
+- [ ] Usuarios por rol creados en la instancia de la nube.
 
 ### Salida (criterio de aceptación del producto)
-- [x] 100 % de los criterios ACC-01 a ACC-07 evaluados (7/7).
-- [x] Todos los criterios de severidad alta en estado "Aceptado".
-- [x] Defectos de aceptación registrados y priorizados en GitHub Issues (INC-02 registrado y cerrado; sin nuevos).
-- [x] Acta de aceptación documentada en la Wiki ([Informe de Pruebas de Aceptación](Informe-de-Pruebas-de-Aceptacion)).
+- [ ] 100 % de los criterios ACC-01…07 evaluados (5 UAT manual + 2 revisión de evidencia).
+- [ ] Todos los criterios de severidad alta en "Aceptado".
+- [ ] Defectos de aceptación registrados en GitHub Issues.
+- [ ] **Acta de aceptación** emitida en el [Informe](Informe-de-Pruebas-de-Aceptacion).
+
+---
+
+## 5. Riesgos
+
+| ID | Riesgo | Mitigación |
+|----|--------|------------|
+| RA-01 | Datos del entorno QA alterados por otras pruebas (K6, capturas) durante la sesión UAT | Coordinar calendario del grupo; K6 no se ejecuta durante la UAT |
+| RA-02 | Usuarios por rol ausentes en la instancia de la nube | Precondición §2: crearlos antes de la sesión |
+| RA-03 | Sesgo del ejecutor (mismo grupo desarrolla y acepta) | Ejecutar por parejas: uno actúa como usuario, otro registra |
 
 ---
 
 ## 6. Trazabilidad
 
-Cada criterio ACC-XX se vincula con su requisito (RF-XX) y con los niveles inferiores en la [Matriz de Trazabilidad](Matriz-de-Trazabilidad).
+Cada criterio ACC-XX se vincula con su requisito (RF-XX) y con los niveles inferiores (CPF/INT/NF) en la [Matriz de Trazabilidad](Matriz-de-Trazabilidad).
 
 ---
 
-*Fin del documento — Plan de Pruebas de Aceptación (Hito 3).*
+## Historial de cambios
+
+| Versión | Fecha | Cambios |
+|---------|-------|---------|
+| 1.0 | 2026-06-12 | Plan inicial con criterios ACC-01…07. |
+| 2.0 | 2026-07-09 | **Revisión**: separación Plan/Informe (los veredictos que figuraban en el Plan se retiran — el registro es exclusivo del acta/Informe); entorno UAT actualizado a la **nube** (VM DigitalOcean, URL pública); procedimiento de ejecución por roles y precondiciones; alcance acotado (5 UAT manual + 2 por revisión de evidencia); riesgos RA-01…03; sin herramientas adicionales (navegador). |
+
+*Fin del documento — Plan de Pruebas de Aceptación. Veredictos en el Informe (acta).*
