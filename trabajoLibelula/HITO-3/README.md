@@ -52,6 +52,9 @@ Documentación colaborativa integrada en el repositorio, en formato Markdown, ed
 | [Informe de Pruebas de Sistema](https://github.com/jhuamaniCond/snipe-it/wiki/Informe-de-Pruebas-de-Sistema) | Resultados de K6 contra el entorno en la nube + evidencias. |
 | [Plan de Pruebas de Aceptación](https://github.com/jhuamaniCond/snipe-it/wiki/Plan-de-Pruebas-de-Aceptacion) | 7 criterios de aceptación (ACC-01…07, UAT). |
 | [Informe de Pruebas de Aceptación](https://github.com/jhuamaniCond/snipe-it/wiki/Informe-de-Pruebas-de-Aceptacion) | Acta de aceptación (UAT). |
+| [Informe de Pruebas Unitarias](https://github.com/jhuamaniCond/snipe-it/wiki/Informe-de-Pruebas-Unitarias) | Resultados de la suite unitaria y campaña de cobertura (85.14 %). |
+| [Plan de Pruebas de Caja Negra](https://github.com/jhuamaniCond/snipe-it/wiki/Plan-de-Pruebas-de-Caja-Negra) | Diseño de casos funcionales (partición de equivalencia, valores límite, tablas de decisión, estados). |
+| [Informe de Pruebas de Caja Negra](https://github.com/jhuamaniCond/snipe-it/wiki/Informe-de-Pruebas-de-Caja-Negra) | Resultados de las pruebas funcionales manuales (CPF-01…CPF-15). |
 | [Matriz de Trazabilidad](https://github.com/jhuamaniCond/snipe-it/wiki/Matriz-de-Trazabilidad) | Requisito ↔ caso ↔ evidencia ↔ resultado (4 niveles). |
 | [Cobertura y Estado del Proyecto](https://github.com/jhuamaniCond/snipe-it/wiki/Cobertura-y-Estado-del-Proyecto) | Cobertura unitaria 85.14 % y estado global. |
 | [Pipeline CI/CD](https://github.com/jhuamaniCond/snipe-it/wiki/Pipeline-CI-CD) · [Arquitectura DevOps](https://github.com/jhuamaniCond/snipe-it/wiki/Arquitectura-DevOps) | Automatización de pruebas en GitHub Actions. |
