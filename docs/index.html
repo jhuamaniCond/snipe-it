@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snipe-IT - Pruebas de Software (Hito 1)</title>
-    <meta name="description" content="Landing page académica para el Hito 1 del curso Pruebas de Software, enfocado en el análisis de arquitectura y calidad de Snipe-IT.">
+    <title>Snipe-IT — Proceso de Pruebas de Software (Proyecto Final)</title>
+    <meta name="description" content="Proyecto final del curso Pruebas de Software: proceso de pruebas multinivel (unitario, funcional, integración y sistema) aplicado a Snipe-IT bajo ISO/IEC/IEEE 29119, con cobertura del 85.14 %, inyección de fallas y automatización CI/CD.">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,6 +31,7 @@
             <nav class="nav-menu" id="nav-menu">
                 <ul>
                     <li><a href="#resumen">Resumen</a></li>
+                    <li><a href="#resultados">Resultados</a></li>
                     <li><a href="#informacion">General</a></li>
                     <li><a href="#stack">Stack</a></li>
                     <li><a href="#arquitectura">Arquitectura</a></li>
@@ -53,28 +54,34 @@
             <div class="hero-bg-glow"></div>
             <div class="container hero-container">
                 <div class="hero-content">
-                    <span class="hero-badge">🎓 Hito 1 — Pruebas de Software</span>
-                    <h1 class="hero-title">Análisis de Arquitectura & Calidad en <span class="text-gradient">Snipe-IT</span></h1>
-                    <p class="hero-subtitle">Proyecto Académico: Proceso de Pruebas de Software aplicado a un Producto Open Source de clase mundial.</p>
-                    
+                    <span class="hero-badge">🎓 Proyecto Final — Pruebas de Software</span>
+                    <h1 class="hero-title">Proceso de Pruebas Multinivel en <span class="text-gradient">Snipe-IT</span></h1>
+                    <p class="hero-subtitle">Diseño, ejecución e inyección de fallas bajo ISO/IEC/IEEE 29119: pruebas unitarias, funcionales, de integración y de sistema sobre un producto Open Source de clase mundial.</p>
+
                     <div class="hero-meta">
-                        
                         <div class="meta-item">
-                            <span class="meta-icon">🏷️</span>
+                            <span class="meta-icon">📊</span>
                             <div class="meta-text">
-                                <span class="meta-label">Versión Analizada</span>
-                                <span class="meta-value">v8.5.1-pre (build 22844, master)</span>
+                                <span class="meta-label">Cobertura Unitaria</span>
+                                <span class="meta-value">85.14 % (núcleo de dominio)</span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-icon">🐞</span>
+                            <div class="meta-text">
+                                <span class="meta-label">Defecto Real Hallado</span>
+                                <span class="meta-value">INC-02 (falla semántica)</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="hero-actions">
-                        <a href="#resumen" class="btn btn-primary">Explorar Análisis</a>
-                        <a href="https://github.com/grokability/snipe-it" target="_blank" rel="noopener" class="btn btn-secondary">
+                        <a href="#resultados" class="btn btn-primary">Ver Resultados</a>
+                        <a href="https://github.com/jhuamaniCond/snipe-it" target="_blank" rel="noopener" class="btn btn-secondary">
                             <svg class="btn-icon" viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
                                 <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                             </svg>
-                            Repo Original
+                            Repositorio del Grupo
                         </a>
                     </div>
                 </div>
@@ -210,6 +217,124 @@
                             En consecuencia, Snipe-IT representa un caso de estudio adecuado para implementar y evaluar pruebas unitarias, pruebas de integración y prácticas de calidad de software utilizando metodologías ágiles Scrum y procesos DevOps automatizados.
                         </p>
 
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resultados de Pruebas (Proyecto Final) -->
+        <section id="resultados" class="section">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-tag">Evidencia Final</span>
+                    <h2>Resultados del Proceso de Pruebas</h2>
+                    <div class="accent-line"></div>
+                    <p class="section-intro">Proceso multinivel ejecutado bajo <strong>ISO/IEC/IEEE 29119</strong> y el modelo de calidad <strong>ISO/IEC 25010</strong>, con selección de atributos no funcionales basada en riesgo y trazabilidad requisito ↔ caso ↔ evidencia.</p>
+                </div>
+
+                <!-- Métricas destacadas -->
+                <div class="stats-grid">
+                    <div class="stat-tile">
+                        <span class="stat-value">85.14 %</span>
+                        <span class="stat-label">Cobertura unitaria (líneas, núcleo)</span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-value">1 021</span>
+                        <span class="stat-label">Métodos unitarios (PHPUnit + PCOV)</span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-value">1 653<span style="font-size:1.2rem">+24</span></span>
+                        <span class="stat-label">Casos de integración (heredados + propios)</span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-value">3</span>
+                        <span class="stat-label">Atributos de sistema con K6 (nube)</span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-value">7</span>
+                        <span class="stat-label">Criterios de aceptación (UAT)</span>
+                    </div>
+                    <div class="stat-tile">
+                        <span class="stat-value">1</span>
+                        <span class="stat-label">Defecto real hallado y corregido</span>
+                    </div>
+                </div>
+
+                <!-- Tarjetas por nivel -->
+                <div class="levels-grid">
+                    <div class="level-card l-unit">
+                        <div class="level-head"><span class="lvl-icon">🧪</span><h3>Unitario</h3></div>
+                        <div class="level-metric">85.14 % <small>de cobertura de líneas</small></div>
+                        <ul>
+                            <li>1 021 métodos en 170 archivos (de ≈279 iniciales)</li>
+                            <li>Campaña de cobertura con PHPUnit + PCOV</li>
+                            <li>3 defectos reales de producción corregidos</li>
+                            <li>Medición automatizada en CI (clover.xml)</li>
+                        </ul>
+                    </div>
+
+                    <div class="level-card l-func">
+                        <div class="level-head"><span class="lvl-icon">🔍</span><h3>Funcional (caja negra)</h3></div>
+                        <div class="level-metric">60 / 61 <small>casos Conforme</small></div>
+                        <ul>
+                            <li>15 casos principales + 46 subcasos (RF-01…RF-11)</li>
+                            <li>Partición, valores límite, tablas de decisión, estados</li>
+                            <li>Ejecución manual sobre despliegue Docker</li>
+                            <li class="warn">1 No conforme: throttling de login (INC-RF09-001)</li>
+                        </ul>
+                    </div>
+
+                    <div class="level-card l-int">
+                        <div class="level-head"><span class="lvl-icon">🔗</span><h3>Integración</h3></div>
+                        <div class="level-metric">1 649 / 1 653 <small>en SQLite · 100 % con MariaDB</small></div>
+                        <ul>
+                            <li>24 casos propios en tests/Feature/Integracion/</li>
+                            <li>Inyección de fallas FI-01/02/03 (sintáctica, semántica, estado)</li>
+                            <li>Runner Docker reproducible (SQLite + MariaDB 11.4.7)</li>
+                            <li>Hallazgo principal: defecto real INC-02</li>
+                        </ul>
+                    </div>
+
+                    <div class="level-card l-sys">
+                        <div class="level-head"><span class="lvl-icon">🛡️</span><h3>Sistema (K6 en la nube)</h3></div>
+                        <div class="level-metric">3 atributos <small>ISO/IEC 25010</small></div>
+                        <ul>
+                            <li>Seguridad: 12/12 checks (302, cabeceras, httpOnly, CSRF)</li>
+                            <li>Desempeño: 0 % errores; saturación ≈ 20 VUs</li>
+                            <li>Fiabilidad: disponibilidad 100 %, 519/519 checks</li>
+                            <li>K6 como cliente externo contra VM DigitalOcean</li>
+                        </ul>
+                    </div>
+
+                    <div class="level-card l-acc">
+                        <div class="level-head"><span class="lvl-icon">✅</span><h3>Aceptación</h3></div>
+                        <div class="level-metric">7 criterios <small>ACC-01…ACC-07</small></div>
+                        <ul>
+                            <li>Formato Dado–Cuando–Entonces, trazados a historias</li>
+                            <li>5 por UAT manual + 2 por revisión de evidencia</li>
+                            <li>Validación sobre el entorno QA en la nube</li>
+                        </ul>
+                    </div>
+
+                    <div class="level-card">
+                        <div class="level-head"><span class="lvl-icon">⚙️</span><h3>Automatización CI/CD</h3></div>
+                        <div class="level-metric">GitHub Actions <small>en verde</small></div>
+                        <ul>
+                            <li>Unit + Coverage (PHP 8.2/8.3/8.4) ✔</li>
+                            <li>Tests en MySQL ✔ · CodeQL Security ✔</li>
+                            <li>Matriz de motores de BD y análisis estático</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Hallazgo principal -->
+                <div class="finding-callout">
+                    <span class="find-icon">🐞</span>
+                    <div>
+                        <span class="finding-tag">HALLAZGO PRINCIPAL · INC-02</span>
+                        <h3>La inyección de una falla semántica destapó un defecto real</h3>
+                        <p>Pese a la extensa suite heredada de más de 1500 pruebas de integración, la falla semántica <strong>FI-02</strong> reveló que Snipe-IT <strong>aceptaba un checkout con fecha de devolución anterior a la de entrega</strong> (<code>expected_checkin &lt; checkout_at</code>), tanto por la interfaz web como por la API.</p>
+                        <p>La causa raíz fue una validación incompleta (<code>nullable|date</code> sin comparar fechas). Se corrigió con la regla condicional <code>after_or_equal:checkout_at</code> y el caso se incorporó a la suite. Evidencia de que <strong>una cobertura amplia no garantiza la coherencia semántica</strong> entre datos.</p>
                     </div>
                 </div>
             </div>
@@ -657,17 +782,17 @@ snipe-it/
                             </div>
                             <div class="pipeline-connector active"></div>
 
-                            <div class="pipeline-node node-running">
-                                <div class="node-icon-running">↻</div>
-                                <div class="node-title">DB Matrix Tests</div>
-                                <div class="node-meta">MySQL / Postgres / SQLite</div>
+                            <div class="pipeline-node node-success">
+                                <div class="node-icon">✓</div>
+                                <div class="node-title">Unit + Coverage</div>
+                                <div class="node-meta">PHPUnit + PCOV · 85.14 %</div>
                             </div>
-                            <div class="pipeline-connector"></div>
+                            <div class="pipeline-connector active"></div>
 
-                            <div class="pipeline-node">
-                                <div class="node-icon">🔒</div>
-                                <div class="node-title">Docker Build</div>
-                                <div class="node-meta">Ubuntu & Alpine</div>
+                            <div class="pipeline-node node-success">
+                                <div class="node-icon">✓</div>
+                                <div class="node-title">DB Tests (MySQL)</div>
+                                <div class="node-meta">Matriz PHP 8.2–8.4</div>
                             </div>
                         </div>
                     </div>
@@ -778,41 +903,41 @@ snipe-it/
                         <div class="timeline-content">
                             <span class="timeline-date">28 / 29 de Mayo, 2026</span>
                             <h3>Hito 1: Planificación y Análisis</h3>
-                            <p>Establecimiento de tableros Kanban/Scrum, presentación de la arquitectura del producto seleccionado (Snipe-IT), plan inicial de pruebas unitarias, preparación de repositorio de trabajo y documentación.</p>
-                            <span class="timeline-status in-progress">En Progreso / Completado</span>
+                            <p>Tableros Kanban/Scrum, presentación de la arquitectura de Snipe-IT, análisis de riesgos por componente, plan inicial de pruebas y preparación del repositorio fork y la Wiki.</p>
+                            <span class="timeline-status in-progress">Completado</span>
                         </div>
                     </div>
 
                     <!-- Hito 2 -->
-                    <div class="timeline-card">
+                    <div class="timeline-card active">
                         <div class="timeline-indicator">2</div>
                         <div class="timeline-content">
                             <span class="timeline-date">10 de Junio, 2026</span>
-                            <h3>Hito 2: Pruebas Unitarias e Integración</h3>
-                            <p>Desarrollo y ejecución sistemática del conjunto de pruebas unitarias y de integración sobre los módulos priorizados. Montaje de tuberías (Pipelines) de CI/CD para automatizar las pruebas unitarias.</p>
-                            <span class="timeline-status waiting">Próximamente</span>
+                            <h3>Hito 2: Pruebas Unitarias y Funcionales</h3>
+                            <p>Campaña de cobertura hasta el <strong>85.14 %</strong> (1 021 métodos, PHPUnit + PCOV) con 3 defectos corregidos, y 15 casos de caja negra + 46 subcasos (RF-01…RF-11). CI/CD de cobertura en GitHub Actions.</p>
+                            <span class="timeline-status in-progress">Completado</span>
                         </div>
                     </div>
 
                     <!-- Hito 3 -->
-                    <div class="timeline-card">
+                    <div class="timeline-card active">
                         <div class="timeline-indicator">3</div>
                         <div class="timeline-content">
                             <span class="timeline-date">08 de Julio, 2026</span>
-                            <h3>Hito 3: Pruebas de Sistema y Aceptación</h3>
-                            <p>Implementación de pruebas del sistema, análisis de cobertura, pruebas no funcionales de rendimiento/accesibilidad, y automatización del despliegue final continuo a producción.</p>
-                            <span class="timeline-status waiting">Próximamente</span>
+                            <h3>Hito 3: Integración, Sistema y Aceptación</h3>
+                            <p>1 653 casos de integración + 24 propios con inyección de fallas (<strong>hallazgo INC-02</strong>); 3 atributos de sistema con K6 contra la nube (Seguridad, Desempeño, Fiabilidad) y 7 criterios de aceptación (UAT).</p>
+                            <span class="timeline-status in-progress">Completado</span>
                         </div>
                     </div>
 
                     <!-- Sustentación -->
-                    <div class="timeline-card">
+                    <div class="timeline-card active">
                         <div class="timeline-indicator">🎓</div>
                         <div class="timeline-content">
-                            <span class="timeline-date">16 / 17 de Julio, 2026</span>
+                            <span class="timeline-date">Julio, 2026</span>
                             <h3>Sustentación Final</h3>
-                            <p>Presentación oral y defensa del proyecto de pruebas de software ante el jurado, sustentación de las métricas de calidad y demostración de las tuberías DevOps automatizadas.</p>
-                            <span class="timeline-status waiting">Cierre</span>
+                            <p>Presentación y defensa del proceso de pruebas multinivel: métricas de calidad, hallazgo de defecto por inyección de fallas, automatización DevOps y artículo técnico IEEE del proyecto.</p>
+                            <span class="timeline-status in-progress">Cierre</span>
                         </div>
                     </div>
                 </div>
@@ -836,38 +961,38 @@ snipe-it/
                         <span class="link-action">Visitar sitio ↗</span>
                     </a>
 
-                    <a href="https://github.com/JhossepV/SO_FinalProyect" target="_blank" rel="noopener" class="link-card">
+                    <a href="https://github.com/jhuamaniCond/snipe-it" target="_blank" rel="noopener" class="link-card">
                         <span class="link-icon">🔱</span>
                         <h3>Fork del Grupo</h3>
-                        <p>Repositorio del equipo de desarrollo con las configuraciones e hitos del curso.</p>
+                        <p>Repositorio del equipo con el código de pruebas, hitos y configuraciones del curso.</p>
                         <span class="link-action">Explorar código ↗</span>
                     </a>
 
-                    <a href="https://github.com/users/jhuamaniCond/projects/2" class="link-card disabled">
+                    <a href="https://github.com/users/jhuamaniCond/projects/2" target="_blank" rel="noopener" class="link-card">
                         <span class="link-icon">📋</span>
                         <h3>GitHub Project</h3>
                         <p>Tablero de control y organización Kanban/Scrum para el equipo.</p>
-                        <span class="link-action">Visitar sitio</span>
+                        <span class="link-action">Visitar sitio ↗</span>
                     </a>
 
-                    <a href="https://github.com/jhuamaniCond/snipe-it/wiki" class="link-card disabled">
+                    <a href="https://github.com/jhuamaniCond/snipe-it/wiki" target="_blank" rel="noopener" class="link-card">
                         <span class="link-icon">📖</span>
                         <h3>GitHub Wiki</h3>
-                        <p>Documentación técnica detallada construida colaborativamente por el grupo.</p>
-                        <span class="link-action">Visitar sitio</span>
+                        <p>Documentación técnica: planes e informes de pruebas por nivel, matriz de trazabilidad y evidencias.</p>
+                        <span class="link-action">Visitar sitio ↗</span>
                     </a>
 
-                    <a href="#" class="link-card disabled">
+                    <a href="https://github.com/jhuamaniCond/snipe-it/actions" target="_blank" rel="noopener" class="link-card">
                         <span class="link-icon">⚙️</span>
                         <h3>GitHub Actions</h3>
-                        <p>Pipelines de integración y testing configurados en el fork.</p>
-                        <span class="link-action">Próximamente en Hito 2</span>
+                        <p>Pipelines de CI/CD: cobertura unitaria, tests en matriz de BD y análisis de seguridad CodeQL.</p>
+                        <span class="link-action">Ver ejecuciones ↗</span>
                     </a>
 
                     <a href="https://jhuamanicond.github.io/snipe-it/" class="link-card disabled">
                         <span class="link-icon">🌐</span>
                         <h3>GitHub Pages</h3>
-                        <p>Página de despliegue y estado de pruebas académicas del proyecto.</p>
+                        <p>Esta página de presentación y estado del proyecto de pruebas.</p>
                         <span class="link-action">Este sitio (Docs/Pages)</span>
                     </a>
                 </div>
@@ -885,14 +1010,15 @@ snipe-it/
             </div>
             <div class="footer-meta-info">
                 <div class="meta-row"><strong>Curso:</strong> Pruebas de Software</div>
-                <div class="meta-row"><strong>Semestre:</strong> 2026-A</div>
-                <div class="meta-row"><strong>Elaborado por:</strong> Integrante 2 — Analista del Producto / Arquitectura</div>
-                <div class="meta-row"><strong>Fecha:</strong> Mayo 2026</div>
+                <div class="meta-row"><strong>Universidad:</strong> Nacional de San Agustín (UNSA)</div>
+                <div class="meta-row"><strong>Semestre:</strong> 2026</div>
+                <div class="meta-row"><strong>Integrantes:</strong> J. Huamani · W. Turpo · J. Zeballos · A. Gallegos · J. Inca · J. Payehuanca</div>
+                <div class="meta-row"><strong>Fecha:</strong> Julio 2026</div>
             </div>
         </div>
         <div class="footer-bottom">
             <div class="container text-center">
-                <p>&copy; 2026 - Universidad Fork Snipe-IT QA Group. Licencia de sitio bajo términos de documentación libre.</p>
+                <p>&copy; 2026 — Grupo de QA Snipe-IT, UNSA. Snipe-IT es marca de Grokability, Inc. (AGPL-3.0). Sitio con fines académicos.</p>
             </div>
         </div>
     </footer>
