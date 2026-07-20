@@ -101,8 +101,8 @@ La cobertura real se obtiene del workflow **`tests-unit-coverage.yml`**, que gen
 
 ## 6. Conclusión del estado
 
-El proyecto presenta una **base de pruebas robusta y verificable** (1 021 unitarias + 1 648 de integración) y un **pipeline de CI/CD operativo con cobertura automatizada**. Las **pruebas funcionales manuales en QA ya se ejecutaron** (sesiones del 2026-06-21 al 2026-06-24): 60 casos Conforme, 1 No conforme (CPF-12.2 → INC-RF09-001) y 0 Bloqueado, según el [Informe de Casos de Pruebas Funcionales](Informe-de-Casos-de-Pruebas-Funcionales). Las brechas unitarias prioritarias (AssetModel, Consumable, License, Statuslabel) se cerraron en la campaña de cobertura y **la medición ya se ejecutó** (85.14 %, `clover.xml`), por lo que los campos `⟦PENDIENTE-CI⟧` de este documento quedaron completados con valores reales. El trabajo restante corresponde al Hito 3 (estabilizar la corrida E2E y completar las pruebas no funcionales pendientes).
+El proyecto presenta una **base de pruebas robusta y verificable** (1 021 unitarias + 1 648 de integración) y un **pipeline de CI/CD operativo con cobertura automatizada**. Las **pruebas funcionales manuales en QA ya se ejecutaron** (sesiones del 2026-06-21 al 2026-06-24): 60 casos Conforme, 1 No conforme (CPF-12.2 → INC-RF09-001) y 0 Bloqueado, según el [Informe de Pruebas de Caja Negra](Informe-de-Pruebas-de-Caja-Negra). Las brechas unitarias prioritarias (AssetModel, Consumable, License, Statuslabel) se cerraron en la campaña de cobertura y **la medición ya se ejecutó** (85.14 %, `clover.xml`), por lo que los campos `⟦PENDIENTE-CI⟧` de este documento quedaron completados con valores reales. El nivel de Sistema del Hito 3 (Seguridad, Desempeño y Fiabilidad) se verificó con **K6** contra el entorno QA en la nube, sin defectos ([Informe de Pruebas de Sistema](Informe-de-Pruebas-de-Sistema) v3.0). El trabajo restante se limita a **NF-SEC-02/03** (403 con sesión autenticada, logout), que se cierran en la sesión UAT de aceptación.
 
 ---
 
-*Fin del documento — Cobertura y Estado Real del Proyecto.*
+*Fin del documento — Cobertura y Estado Real del Proyecto.*

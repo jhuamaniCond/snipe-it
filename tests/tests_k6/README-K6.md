@@ -1,6 +1,6 @@
-# Entorno compartido de pruebas de DESEMPEÑO con K6
+# Entorno compartido de pruebas de SISTEMA con K6 (3 atributos no funcionales)
 
-> Pruebas de **nivel Sistema · tipo no funcional (eficiencia de desempeño, ISO 25010)** sobre el **entorno QA en nube** (`http://159.223.135.124`). Herramienta indicada en la bibliografía del curso.
+> Pruebas de **nivel Sistema · no funcionales (ISO 25010)** sobre el **entorno QA en nube** (`http://159.223.135.124`), con **K6 como cliente externo**. Cubre los **tres atributos oficiales** del [Plan de Pruebas de Sistema](../../trabajoLibelula/documentacionWiki/Plan-de-Pruebas-de-Sistema.md): **Seguridad, Desempeño y Fiabilidad**. K6 no es solo un generador de carga: mediante `check()` sobre estado/cabeceras/cookies también verifica seguridad y fiabilidad.
 
 ---
 
@@ -26,33 +26,39 @@
 ## 3. Cómo ejecutar (desde la raíz del repo)
 
 ```powershell
-# Opción A — wrapper:
-.\trabajoLibelula\HITO-3\Sistema\k6\correr-k6.ps1
+# Opción A — wrapper (desempeño smoke por defecto):
+.\tests\tests_k6\correr-k6.ps1
 
-# Opción B — docker compose directo:
-docker compose -f tests/tests_k6/docker-compose.k6.yml run --rm k6
+# Opción B — docker compose directo, eligiendo el script:
+docker compose -f tests/tests_k6/docker-compose.k6.yml run --rm k6 run /scripts/k6-seguridad.js
+docker compose -f tests/tests_k6/docker-compose.k6.yml run --rm k6 run /scripts/k6-desempeno.js
+docker compose -f tests/tests_k6/docker-compose.k6.yml run --rm k6 run /scripts/k6-fiabilidad.js
+
+# Perfiles de carga (coordinar los altos): PERFIL = esc20 | esc50 | esc100 | rampa
+docker compose -f tests/tests_k6/docker-compose.k6.yml run --rm -e PERFIL=esc20 k6 run /scripts/k6-perfil-carga.js
 ```
 
-La 1.ª vez descarga la imagen (~30 MB). Al terminar, K6 imprime el resumen: peticiones, `http_req_duration` (avg/p90/p95), errores y si se cumplieron los **umbrales**.
+La 1.ª vez descarga la imagen (~30 MB). Al terminar, K6 imprime el resumen con los **umbrales** (`thresholds`) en verde/rojo.
 
-## 4. Prueba oficial incluida — `k6-desempeno.js` (NF-PERF)
+## 4. Scripts incluidos (un atributo por script)
 
-| Parámetro | Valor | Por qué |
-|---|---|---|
-| Escenario | `constant-vus`: **5 VUs × 30 s** (pausa 1 s/iteración) | Carga **prudente**: la VM QA es compartida y tiene 1 vCPU / 1 GB RAM |
-| Endpoint | `GET /login` | Página pública representativa (sin sesión) |
-| Umbral 1 | `p(95) < 2000 ms` | Criterio NF-PERF-01 del Plan de Sistema |
-| Umbral 2 | `http_req_failed < 1 %` | Estabilidad bajo concurrencia |
+| Script | Atributo | Config | Umbrales |
+|---|---|---|---|
+| `k6-seguridad.js` | **Seguridad** | 1 VU · 1 iter | `checks: rate==1.0` (12 checks: 302, cabeceras, cookie httpOnly, CSRF) |
+| `k6-desempeno.js` | **Desempeño** (smoke) | 5 VUs × 30 s | `p(95)<2000ms` · `http_req_failed<1%` |
+| `k6-perfil-carga.js` | **Desempeño** (carga) | `PERFIL`: esc20/esc50/esc100/rampa | `p(95)<2000ms` · `http_req_failed<1%` |
+| `k6-fiabilidad.js` | **Fiabilidad** | 10 VUs × 45 s | `http_req_failed<1%` (disponibilidad) · `checks: rate==1.0` (404 controlado) |
 
-**Interpretación:** si K6 termina sin `✗` en los thresholds → **PASS**. El resumen completo se guarda como evidencia (copiar/pegar la salida o captura) en `HITO-3/Sistema/Evidencias/`.
+**Interpretación:** si K6 termina sin `✗` en los thresholds → **PASS**. Guardar la salida como evidencia en `trabajoLibelula/HITO-3/Sistema/Evidencias/`.
 
 ## 5. Reglas del grupo
 
-1. **No subir la carga** (más VUs/duración) sin coordinarlo: la VM es compartida y una prueba de estrés puede dejarla lenta para los demás (o tumbarla con 1 GB de RAM).
+1. **No subir la carga** (más VUs/duración) sin coordinarlo: los perfiles altos (esc50/esc100/rampa) saturan la VM compartida ~1 min.
 2. **No ejecutar K6 durante una sesión de caja negra manual** de otro compañero (alteraría sus tiempos).
-3. Nuevos scripts → misma carpeta `k6/`, mismo pin de versión, umbrales documentados en el Plan.
-4. La evidencia oficial es la salida del **resumen final de K6** con los thresholds en verde.
+3. **Todos los scripts son de solo lectura** (GET) — no llenan la BD del entorno QA.
+4. Nuevos scripts → misma carpeta `tests/tests_k6/`, mismo pin de versión, umbrales documentados en el Plan.
+5. La evidencia oficial es la salida del **resumen final de K6** con los thresholds en verde.
 
 ---
 
-*Entorno K6 compartido — Hito 3 · Pruebas de Sistema (atributo oficial: Desempeño).*
+*Entorno K6 compartido — Hito 3 · Pruebas de Sistema (atributos oficiales: Seguridad, Desempeño, Fiabilidad).*

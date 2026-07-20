@@ -71,7 +71,7 @@ El repositorio cuenta con **11 workflows** en `.github/workflows/`, verificados 
 | `html/` | Reporte navegable | Evidencia visual |
 | `junit.xml` | Resultados PASS/FAIL | Transcrito en [Informe de Pruebas Unitarias](Informe-de-Pruebas-Unitarias) (1 504/1 505 PASS) |
 
-> **Estos artefactos son la fuente oficial y verificable** de los porcentajes de cobertura y los resultados de ejecución. La medición de cobertura unitaria **ya se ejecutó y transcribió** (artefacto `trabajoLibelula/clover.xml`); los valores que aún requieren una corrida en CI (p. ej. la suite E2E) se marcan como `⟦PENDIENTE-CI⟧` hasta su transcripción.
+> **Estos artefactos son la fuente oficial y verificable** de los porcentajes de cobertura y los resultados de ejecución. La medición de cobertura unitaria **ya se ejecutó y transcribió** (artefacto `trabajoLibelula/clover.xml`). El nivel de Sistema (Seguridad, Desempeño, Fiabilidad) se verifica de forma independiente con **K6** contra el entorno QA en la nube, fuera de este pipeline de CI (ver [Informe de Pruebas de Sistema](Informe-de-Pruebas-de-Sistema)).
 
 ---
 
@@ -110,4 +110,4 @@ Los artefactos de este pipeline son la evidencia que cierra el [Informe de Prueb
 
 ---
 
-*Fin del documento — Pipeline CI/CD.*
+*Fin del documento — Pipeline CI/CD.*

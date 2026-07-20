@@ -8,10 +8,10 @@
 //   - res.headers   -> cabeceras de seguridad (X-Frame-Options, nosniff, ...)
 //   - res.cookies   -> atributos de cookies (httpOnly, samesite)
 //
-// Casos cubiertos (Plan de Sistema §5):
+// Casos cubiertos (Plan de Sistema §5 — atributo SEGURIDAD):
 //   NF-SEC-01  ruta protegida sin sesión -> 302 a /login (sin exponer datos)
 //   NF-SEC-hdr cabeceras de seguridad + cookie de sesión httpOnly + token CSRF
-//   NF-REL-02  (complementaria) ruta inexistente -> 404 controlado
+// (El manejo de errores/404 y la disponibilidad se prueban en k6-fiabilidad.js.)
 //
 // Ejecución (1 usuario, 1 iteración — solo lectura, segundos):
 //   docker compose -f tests/tests_k6/docker-compose.k6.yml run --rm k6 run /scripts/k6-seguridad.js
@@ -60,13 +60,5 @@ export default function () {
     },
     'SEC-hdr: token CSRF presente (cookie XSRF-TOKEN)': (r) => !!r.cookies['XSRF-TOKEN'],
     'SEC-hdr: formulario de login con campo _token (CSRF)': (r) => String(r.body || '').includes('_token'),
-  });
-
-  // --- NF-REL-02 (complementaria): manejo de ruta inexistente -----------------
-  const noExiste = http.get(`${BASE_URL}/ruta-inexistente-k6`);
-
-  check(noExiste, {
-    'REL-02: ruta inexistente responde 404': (r) => r.status === 404,
-    'REL-02: sin stacktrace expuesto': (r) => !String(r.body || '').includes('Stack trace'),
   });
 }

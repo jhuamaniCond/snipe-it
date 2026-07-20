@@ -114,4 +114,4 @@ La presentación del producto en este hito establece la **línea base** sobre la
 
 ---
 
-*Fin del documento — Hito 1.*
+*Fin del documento — Hito 1.*

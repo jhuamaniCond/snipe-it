@@ -22,10 +22,11 @@ Toda la información publicada está **verificada contra el repositorio real**. 
 - [Hito 1 — Presentación del Producto de Software](Hito-1-Presentacion-del-Producto)
 
 ### Hito 2 — Sprint 2 (pruebas unitarias, funcionales, integración y CI/CD)
+- [Plan de Pruebas](Plan-de-Pruebas) (maestro: catálogo RF/RNF)
 - [Plan de Pruebas Unitarias](Plan-de-Pruebas-Unitarias)
 - [Informe de Pruebas Unitarias](Informe-de-Pruebas-Unitarias)
-- [Diseño de Casos de Pruebas Funcionales](Diseno-de-Casos-de-Pruebas-Funcionales)
-- [Informe de Casos de Pruebas Funcionales](Informe-de-Casos-de-Pruebas-Funcionales)
+- [Plan de Pruebas de Caja Negra](Plan-de-Pruebas-de-Caja-Negra)
+- [Informe de Pruebas de Caja Negra](Informe-de-Pruebas-de-Caja-Negra)
 - [Plan de Pruebas de Integración](Plan-de-Pruebas-de-Integracion)
 - [Pipeline CI/CD](Pipeline-CI-CD)
 - [Matriz de Trazabilidad](Matriz-de-Trazabilidad)

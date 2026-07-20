@@ -1,17 +1,18 @@
-# Diseño de Casos de Pruebas Funcionales
+# Plan de Pruebas de Caja Negra
 
-> Conforme a **ISO/IEC/IEEE 29119-3** (*Test Design Specification* / *Test Case Specification*). Diseño de pruebas **funcionales, de caja negra y de ejecución manual**, organizado **por requisito funcional** del producto Snipe-IT.
+> Conforme a **ISO/IEC/IEEE 29119-3** (*Test Design Specification* / *Test Case Specification*). Diseño de pruebas **funcionales, de caja negra y de ejecución manual**, organizado **por requisito funcional** del producto Snipe-IT. El catálogo canónico de requisitos (RF/RNF) vive en el [Plan de Pruebas](Plan-de-Pruebas) maestro; este documento detalla el **diseño específico de caja negra** (técnicas aplicadas y casos CPF-XX).
 
 | Campo | Detalle |
 |-------|---------|
-| **Documento** | Diseño de Casos de Pruebas Funcionales — Snipe-IT |
-| **Versión** | **2.1 (amplía el alcance de usuario: + RF-09 Login, RF-10 Usuarios, RF-11 Accesorios)** |
-| **Reemplaza a** | v2.0 (8 requisitos) · v1.0 (lista plana CPF-01…CPF-11) |
+| **Documento** | Plan de Pruebas de Caja Negra — Snipe-IT |
+| **Versión** | **3.0** (renombrado y reestructurado desde `Diseno-de-Casos-de-Pruebas-Funcionales.md` v2.1; entorno de pruebas actualizado a la nube) |
+| **Antecesor** | `Diseno-de-Casos-de-Pruebas-Funcionales.md` v2.1 (8/06/11 requisitos) · v1.0 (lista plana CPF-01…CPF-11) |
+| **Plan maestro** | [Plan de Pruebas](Plan-de-Pruebas) (catálogo RF/RNF y panorama general) |
 | **Hito / Sprint** | Hito 2 / Sprint 2 |
 | **Tipo de prueba** | Funcional / Caja negra / Manual |
-| **Ambiente de ejecución** | QA (despliegue único compartido por el equipo) |
+| **Entorno QA oficial** | **VM DigitalOcean** — Ubuntu 24.04 LTS · 1 vCPU · 1 GB RAM · 25 GB SSD — Docker Compose (Snipe-IT + MariaDB 11.4.7) → **http://159.223.135.124/** |
 | **Repositorio** | `jhuamaniCond/snipe-it` (PHP 8.2+ / Laravel 12) |
-| **Fecha de elaboración** | 2026-06-12 |
+| **Fecha de elaboración** | 2026-06-12 · reestructurado 2026-07-20 |
 | **Estándar** | ISO/IEC/IEEE 29119-3 |
 
 ---
@@ -20,20 +21,20 @@
 
 Snipe-IT es un sistema de gestión de activos de TI cuyo valor depende de la **integridad de las operaciones de inventario**: alta de activos, asignación (checkout) y devolución (checkin) de equipos, control de licencias por asientos, consumo de stock y reglas de borrado referencial. Un fallo funcional en estas operaciones se traduce directamente en **inventario incorrecto** (activos duplicados, asientos sobreasignados, stock negativo o categorías huérfanas).
 
-Este documento **especifica el diseño** de los casos de prueba funcionales de **caja negra** que validan, desde la interfaz de usuario y sin acceso al código, que el comportamiento observable del sistema cumple cada requisito funcional. La validación se realiza **manualmente** en un ambiente de **QA** compartido.
+Este documento **especifica el diseño** de los casos de prueba funcionales de **caja negra** que validan, desde la interfaz de usuario y sin acceso al código, que el comportamiento observable del sistema cumple cada requisito funcional (catálogo en el [Plan de Pruebas](Plan-de-Pruebas) §3). La validación se realiza **manualmente** sobre el **entorno QA oficial en la nube**.
 
-La **ejecución, los veredictos y las evidencias** se consignan en el [Informe de Casos de Pruebas Funcionales](Informe-de-Casos-de-Pruebas-Funcionales). Este documento **no** registra resultados de ejecución.
+La **ejecución, los veredictos y las evidencias** se consignan en el [Informe de Pruebas de Caja Negra](Informe-de-Pruebas-de-Caja-Negra). Este documento **no** registra resultados de ejecución.
 
 ### 1.1 Trazabilidad del diseño contra el comportamiento real
 
-A diferencia de la v1.0, cada requisito de esta versión se ancló al **comportamiento verificable del producto**, corroborado por inspección de la suite de pruebas automatizadas existente (`tests/Feature/**`). Esa suite **no sustituye** la prueba funcional manual, pero confirma cuál es el resultado esperado correcto y evita diseñar contra supuestos. Las referencias a archivos reales aparecen en cada requisito como *"Comportamiento corroborado en"*.
+Cada requisito de este diseño se ancló al **comportamiento verificable del producto**, corroborado por inspección de la suite de pruebas automatizadas existente (`tests/Feature/**`). Esa suite **no sustituye** la prueba funcional manual, pero confirma cuál es el resultado esperado correcto y evita diseñar contra supuestos. Las referencias a archivos reales aparecen en cada requisito como *"Comportamiento corroborado en"*.
 
 ### 1.2 Distinción frente a las pruebas unitarias
 
-| Aspecto | Pruebas unitarias | Pruebas funcionales (este documento) |
+| Aspecto | Pruebas unitarias | Pruebas de caja negra (este documento) |
 |---------|-------------------|----------------------------------------|
 | Caja | Blanca (acceso al código) | **Negra** (sin acceso al código) |
-| Ambiente | DEV (desarrollador) | **QA** (equipo) |
+| Ambiente | DEV (desarrollador) | **QA en la nube** (equipo) |
 | Ejecución | Automatizada (PHPUnit) | **Manual** |
 | Objetivo | Lógica interna de métodos | **Cumplimiento de requisitos del usuario** |
 | Documento | [Plan de Pruebas Unitarias](Plan-de-Pruebas-Unitarias) | Este documento |
@@ -42,44 +43,42 @@ A diferencia de la v1.0, cada requisito de esta versión se ancló al **comporta
 
 ## 2. Entorno de pruebas
 
-> **Actualización (2026-07-09): entorno QA oficial EN LA NUBE.** Las pruebas de caja negra ya **no** se ejecutan en despliegues locales individuales, sino en una **instancia QA única compartida por todo el equipo**, desplegada en una máquina virtual en la nube. Esto garantiza que los 6 integrantes (y el docente) prueban **el mismo sistema, con los mismos datos, bajo las mismas condiciones**.
+> **Mismo entorno que el nivel de Sistema:** el [Plan de Pruebas de Sistema](Plan-de-Pruebas-de-Sistema) v4.0 verifica sus atributos no funcionales (Seguridad, Desempeño, Fiabilidad) con **K6** contra esta misma VM. La caja negra manual y las pruebas de sistema comparten, por tanto, el **mismo despliegue QA en la nube**, garantizando que ambos niveles validan exactamente el mismo build del producto.
 
-| Elemento | Definición |
-|----------|------------|
-| **Entorno QA oficial** | **VM en DigitalOcean** — Ubuntu 24.04 LTS x64 · 1 vCPU · 1 GB RAM · 25 GB SSD |
-| **URL de la aplicación (AUT)** | **http://159.223.135.124/** — Snipe-IT desplegado con Docker Compose (app + MariaDB 11.4.7) |
-| Acceso administrativo | SSH con clave privada (`ssh -i id_ed25519 root@159.223.135.124`, desde PowerShell/OpenSSH); la clave y credenciales se comparten **solo por el canal privado del grupo** (excluidas del repositorio vía `.gitignore`) |
-| Tipo de acceso de prueba | Navegador web, interfaz administrativa (AdminLTE 2 / Bootstrap 3) |
-| Perfil de ejecución | Usuario con permisos adecuados por caso (superusuario o permiso granular: `checkoutAssets`, `checkinAssets`, `checkoutConsumables`, `deleteCategories`, etc.) |
-| Datos base | Modelos de activo, status labels, categorías, usuarios y ubicaciones poblados antes de la sesión (mismos datos QA de los guiones RF-02…RF-11) |
-| Motor de base de datos | **MariaDB 11.4.7** (contenedor `snipe-it-db-1`); el comportamiento funcional es independiente del motor |
-| Configuración FMCS | `full_multiple_companies_support` desactivado por defecto; se activa solo en los casos que lo requieren (RF-02 variante multiempresa) |
-| Registro de evidencia | Capturas de pantalla por caso **tomadas sobre la URL del entorno QA en nube**, adjuntas en el informe; defectos en GitHub Issues (etiqueta `bug`) |
-| Entorno local (secundario) | El Docker Compose local (`http://localhost:8000`) queda solo como entorno de **desarrollo/preparación**, no para evidencias oficiales |
+| Campo | Detalle |
+|-------|---------|
+| **Aplicación bajo prueba (AUT)** | Snipe-IT — Docker Compose sobre la VM |
+| **Entorno QA oficial** | **VM DigitalOcean** — Ubuntu 24.04 LTS · 1 vCPU · 1 GB RAM · 25 GB SSD |
+| **URL pública** | **http://159.223.135.124/** |
+| **Motor de base de datos** | MariaDB 11.4.7 (Docker Compose) |
+| **Tipo de acceso** | Navegador web, interfaz administrativa (AdminLTE 2 / Bootstrap 3) |
+| **Acceso administrativo (SSH)** | Clave privada, fuera del repositorio (`.gitignore`); credenciales por canal privado del grupo |
+| **Perfil de ejecución** | Usuario con permisos adecuados por caso (superusuario o permiso granular: `checkoutAssets`, `checkinAssets`, `checkoutConsumables`, `deleteCategories`, etc.) |
+| **Datos base** | Modelos de activo, status labels, categorías, usuarios y ubicaciones poblados mediante seeders/factories antes de la sesión |
+| **Configuración FMCS** | `full_multiple_companies_support` desactivado por defecto; se activa solo en los casos que lo requieren (RF-02 variante multiempresa) |
+| **Registro de evidencia** | Capturas de pantalla por caso, adjuntas en el informe; defectos en GitHub Issues (etiqueta `bug`) |
 
-> **Precondición global del entorno:** la instancia QA en nube debe estar accesible, migrada y con datos de demostración cargados antes de iniciar la sesión de ejecución. Las capturas de evidencia deben mostrar la **URL del entorno QA** (159.223.135.124) en la barra del navegador. Mientras no exista evidencia de ejecución manual, los casos figuran como **pendientes de validación** en el informe.
+> **Precondición global del entorno:** la VM debe estar accesible, migrada y con datos de demostración cargados antes de iniciar la sesión de ejecución. Los guiones de ejecución por requisito (`evidencias/CajaNegra/RF-XX/guion-RF-XX.md`) documentan los datos sembrados y los pasos de cada sesión.
 
 ---
 
-## 3. Matriz de requisitos funcionales
+## 3. Matriz de requisitos funcionales (vista de caja negra)
 
-> **Delimitación de alcance.** Estos 11 requisitos cubren los **subsistemas núcleo de cara al usuario** seleccionados como alcance académico en [Hito 1 — Presentación del Producto](Hito-1-Presentacion-del-Producto) §4 (Acceso, Activos, Licencias, Inventario, Usuarios, Accesorios y Checkout). **No** representan la totalidad funcional de Snipe-IT, que comprende ~20 subsistemas (componentes, mantenimientos, importación, reportes, custom fields, etc.). La selección es deliberada y se sostiene a lo largo de los tres hitos.
->
-> **Nota de la v2.1:** la v2.0 declaraba "Usuarios" dentro del alcance pero **ningún requisito lo probaba realmente**. Esta versión corrige esa incoherencia añadiendo **RF-10 (gestión de usuarios)**, e incorpora **RF-09 (autenticación)** —la primera acción que ejecuta cualquier usuario— y **RF-11 (checkout/checkin de accesorio)** —para cubrir el patrón de asignación en un segundo módulo de inventario.
+> **Catálogo canónico:** la definición de cada `RF-XX` (subsistema, ruta/acción) es la del [Plan de Pruebas](Plan-de-Pruebas) §3. Esta tabla añade la vista **específica de caja negra**: las técnicas de diseño de casos seleccionadas por requisito.
 
-| ID Req. | Requisito funcional | Subsistema | Ruta / acción verificada | Técnicas de caja negra seleccionadas |
-|---------|---------------------|------------|---------------------------|--------------------------------------|
-| **RF-01** | Registrar un activo con etiqueta (*asset tag*) única | Activos | `hardware.store` | PE + AVL + TD |
-| **RF-02** | Asignar un activo a un destino (checkout) | Activos / Checkout | `hardware.checkout.store` | TE + PE + TD |
-| **RF-03** | Devolver un activo asignado (checkin) | Activos / Checkout | `hardware.checkin.store` | TE + caso negativo |
-| **RF-04** | Crear una licencia con un número definido de asientos | Licencias | `licenses.store` | AVL + PE |
-| **RF-05** | Asignar un asiento de licencia a un usuario o activo | Licencias | `licenses.checkout` | TE + PE + AVL |
-| **RF-06** | Descontar stock de un consumible al asignarlo | Inventario | `consumables.checkout.store` | AVL + PE |
-| **RF-07** | Impedir la eliminación de una categoría con elementos asociados | Categorías | `categories.destroy` | TD |
-| **RF-08** | Reflejar la disponibilidad del activo según su *status label* | Activos | `availableForCheckout()` / `getStatuslabelType()` | TD |
-| **RF-09** | Autenticar a un usuario (login / logout) | Acceso | `login` (POST) / `logout` | PE + TE + caso negativo |
-| **RF-10** | Registrar y editar un usuario | Usuarios | `users.store` / `users.update` | PE + AVL |
-| **RF-11** | Asignar y devolver un accesorio (checkout/checkin) | Accesorios / Checkout | `accessories.checkout.store` / `accessories.checkin.store` | TE + PE + AVL |
+| ID Req. | Requisito funcional | Ruta / acción verificada | Técnicas de caja negra seleccionadas |
+|---------|---------------------|---------------------------|--------------------------------------|
+| **RF-01** | Registrar un activo con etiqueta (*asset tag*) única | `hardware.store` | PE + AVL + TD |
+| **RF-02** | Asignar un activo a un destino (checkout) | `hardware.checkout.store` | TE + PE + TD |
+| **RF-03** | Devolver un activo asignado (checkin) | `hardware.checkin.store` | TE + caso negativo |
+| **RF-04** | Crear una licencia con un número definido de asientos | `licenses.store` | AVL + PE |
+| **RF-05** | Asignar un asiento de licencia a un usuario o activo | `licenses.checkout` | TE + PE + AVL |
+| **RF-06** | Descontar stock de un consumible al asignarlo | `consumables.checkout.store` | AVL + PE |
+| **RF-07** | Impedir la eliminación de una categoría con elementos asociados | `categories.destroy` | TD |
+| **RF-08** | Reflejar la disponibilidad del activo según su *status label* | `availableForCheckout()` / `getStatuslabelType()` | TD |
+| **RF-09** | Autenticar a un usuario (login / logout) | `login` (POST) / `logout` | PE + TE + caso negativo |
+| **RF-10** | Registrar y editar un usuario | `users.store` / `users.update` | PE + AVL |
+| **RF-11** | Asignar y devolver un accesorio (checkout/checkin) | `accessories.checkout.store` / `accessories.checkin.store` | TE + PE + AVL |
 
 **Leyenda de técnicas:** PE = Partición de equivalencia · AVL = Análisis de valores límite · TD = Tabla de decisión · TE = Transición de estados.
 
@@ -330,16 +329,16 @@ Cobertura: CPF-03 (transición directa), CPF-04 (transición inversa), CPF-05 (r
 | **Técnicas** | AVL |
 | **Prioridad** | Media-Alta |
 | **Resultado esperado** | El stock disponible disminuye en la cantidad entregada; el consumible aparece asignado al usuario; se registra la acción *checkout* con la cantidad |
-| **Evidencia** | ⟦PENDIENTE-QA⟧ |
+| **Evidencia** | [CPF-09.1](capturas/CPF-09-1.png) · [CPF-09.2](capturas/CPF-09-2.png) — Conforme (QA 2026-06-21) |
 
 #### Subcasos derivados de RF-06 — Análisis de valores límite sobre el stock
-| Subcaso | Borde | Estado inicial | Acción | Resultado esperado |
-|---------|-------|----------------|--------|--------------------|
-| **CPF-09.1** Descuento nominal | dentro de rango | `qty = 2` | Checkout de 1 unidad | Stock restante = 1 |
-| **CPF-09.2** Último ítem | borde inferior | `qty = 1` | Checkout de 1 unidad | Stock restante = 0 |
-| **CPF-09.3** Sin stock | bajo el borde | `qty = 0` (sin unidades) | Intento de checkout | **Rechazo**: no se permite la asignación |
-| **CPF-09.4** Destino ausente | PE inválida | `qty ≥ 1` | Checkout sin `assigned_to` | **Rechazo** con error de validación |
-| **CPF-09.5** Sin permiso | PE inválida | cualquiera | Usuario sin permiso | Acceso **prohibido** (403) |
+| Subcaso | Borde | Estado inicial | Acción | Resultado esperado | Evidencia |
+|---------|-------|----------------|--------|--------------------|-----------|
+| **CPF-09.1** Descuento nominal | dentro de rango | `qty = 2` | Checkout de 1 unidad | Stock restante = 1 | [CPF-09.1](capturas/CPF-09-1.png) |
+| **CPF-09.2** Último ítem | borde inferior | `qty = 1` | Checkout de 1 unidad | Stock restante = 0 | [CPF-09.2](capturas/CPF-09-2.png) |
+| **CPF-09.3** Sin stock | bajo el borde | `qty = 0` (sin unidades) | Intento de checkout | **Rechazo**: no se permite la asignación | [CPF-09.3](capturas/CPF-09-3.png) |
+| **CPF-09.4** Destino ausente | PE inválida | `qty ≥ 1` | Checkout sin `assigned_to` | **Rechazo** con error de validación | [CPF-09.4](capturas/CPF-09-4.png) |
+| **CPF-09.5** Sin permiso | PE inválida | cualquiera | Usuario sin permiso | Acceso **prohibido** (403) | [CPF-09.5](capturas/CPF-09-5.png) |
 
 ---
 
@@ -363,7 +362,7 @@ Cobertura: CPF-03 (transición directa), CPF-04 (transición inversa), CPF-05 (r
 | **Técnicas** | TD (R1) |
 | **Prioridad** | Alta |
 | **Resultado esperado** | El sistema **impide** la eliminación, informa que la categoría no está vacía y la categoría **no** se elimina |
-| **Evidencia** | ⟦PENDIENTE-QA⟧ |
+| **Evidencia** | [CPF-10 (modelos)](capturas/CPF-10.png) · [CPF-10 (activos)](capturas/CPF-10-assets.png) — Conforme (QA 2026-06-21) |
 
 #### CPF-11 — Eliminar categoría vacía
 | Campo | Detalle |
@@ -376,12 +375,12 @@ Cobertura: CPF-03 (transición directa), CPF-04 (transición inversa), CPF-05 (r
 | **Técnicas** | TD (R3) |
 | **Prioridad** | Media |
 | **Resultado esperado** | La categoría se **elimina** (borrado lógico) y se muestra mensaje de éxito |
-| **Evidencia** | ⟦PENDIENTE-QA⟧ |
+| **Evidencia** | [CPF-11](capturas/CPF-11.png) — Conforme (QA 2026-06-21) |
 
 #### Subcaso derivado de RF-07
-| Subcaso | Técnica | Condición | Resultado esperado |
-|---------|---------|-----------|--------------------|
-| **CPF-10.1** Eliminación sin permiso | TD (R2) | Categoría vacía o no; usuario sin `deleteCategories` | Acceso **prohibido** (403); no se elimina |
+| Subcaso | Técnica | Condición | Resultado esperado | Evidencia |
+|---------|---------|-----------|--------------------|-----------|
+| **CPF-10.1** Eliminación sin permiso | TD (R2) | Categoría vacía o no; usuario sin `deleteCategories` | Acceso **prohibido** (403); no se elimina | [CPF-10.1](capturas/CPF-10.1.png) |
 
 **Tabla de decisión — Eliminación de categoría (RF-07):**
 
@@ -571,8 +570,19 @@ Cobertura: CPF-03 (transición directa), CPF-04 (transición inversa), CPF-05 (r
 
 ## 7. Trazabilidad
 
-Cada caso `CPF-XX` (y sus subcasos `CPF-XX.n`) se vincula a su requisito `RF-XX` y a su evidencia de ejecución en la [Matriz de Trazabilidad](Matriz-de-Trazabilidad) y en el [Informe de Casos de Pruebas Funcionales](Informe-de-Casos-de-Pruebas-Funcionales). La cobertura directa (requisito → caso) e inversa (caso → requisito) queda asegurada: los 11 requisitos RF-01…RF-11 tienen al menos un caso funcional diseñado.
+Cada caso `CPF-XX` (y sus subcasos `CPF-XX.n`) se vincula a su requisito `RF-XX` (definido en el [Plan de Pruebas](Plan-de-Pruebas) §3) y a su evidencia de ejecución en la [Matriz de Trazabilidad](Matriz-de-Trazabilidad) y en el [Informe de Pruebas de Caja Negra](Informe-de-Pruebas-de-Caja-Negra). La cobertura directa (requisito → caso) e inversa (caso → requisito) queda asegurada: los 11 requisitos RF-01…RF-11 tienen al menos un caso funcional diseñado.
 
 ---
 
-*Fin del documento — Diseño de Casos de Pruebas Funcionales v2.1.*
+## Historial de cambios
+
+| Versión | Fecha | Cambios |
+|---------|-------|---------|
+| 1.0 | 2026-06-12 | Diseño inicial (lista plana CPF-01…CPF-11). |
+| 2.0 | — | 8 requisitos, corrección contra el comportamiento real del producto. |
+| 2.1 | 2026-06-12 | Ampliación de alcance de usuario: + RF-09 (Login), RF-10 (Usuarios), RF-11 (Accesorios). Documento publicado como `Diseno-de-Casos-de-Pruebas-Funcionales.md`. |
+| **3.0** | 2026-07-20 | **Renombrado y reestructurado** desde `Diseno-de-Casos-de-Pruebas-Funcionales.md` para alinear el nombre con el resto de niveles (`Plan-de-Pruebas-de-X`). El catálogo de RF (antes §3) se **traslada** al nuevo [Plan de Pruebas](Plan-de-Pruebas) maestro; este documento retiene el **diseño específico de caja negra** (técnicas por requisito, casos CPF-XX). **Entorno de pruebas (§2) actualizado**: se documenta que la ejecución manual usa el mismo **entorno QA oficial en la nube** (VM DigitalOcean, `http://159.223.135.124/`) que el nivel de Sistema (K6), reemplazando la referencia genérica anterior a "Docker Compose / instancia QA equivalente". |
+
+---
+
+*Fin del documento — Plan de Pruebas de Caja Negra v3.0.*

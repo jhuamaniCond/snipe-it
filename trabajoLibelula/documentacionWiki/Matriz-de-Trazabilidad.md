@@ -50,7 +50,7 @@ Asegurar que **cada requisito funcional** está cubierto por al menos un caso de
 >
 > ⁽¹⁾ En el Hito 2 **CPF-05** (disponibilidad por *status label* no desplegable) y **CPF-08** (agotamiento de asientos de licencia) **no contaban con prueba funcional automatizada**. En el **Hito 3** el grupo añadió su cobertura de integración automatizada: **CPF-08** (`LicenseSeatExhaustionTest`) e **INT-13** (`StatusLabelDisponibilidadTest`), ambas **verdes en SQLite y MariaDB**. Ver [Informe de Pruebas de Integración](Informe-de-Pruebas-de-Integracion) §3.
 >
-> **Nota sobre subcasos:** el [Diseño de Casos de Pruebas Funcionales](Diseno-de-Casos-de-Pruebas-Funcionales) v2.0 desglosa los 11 casos principales en **30 subcasos** `CPF-XX.n` (positivos, negativos y de valores límite). Esta matriz traza el caso principal; el detalle de subcasos y su evidencia se mantiene en el informe funcional.
+> **Nota sobre subcasos:** el [Plan de Pruebas de Caja Negra](Plan-de-Pruebas-de-Caja-Negra) v3.0 desglosa los **15 casos principales** en **46 subcasos** `CPF-XX.n` (positivos, negativos y de valores límite). Esta matriz traza el caso principal; el detalle de subcasos y su evidencia se mantiene en el [Informe de Pruebas de Caja Negra](Informe-de-Pruebas-de-Caja-Negra).
 
 ---
 
@@ -58,17 +58,17 @@ Asegurar que **cada requisito funcional** está cubierto por al menos un caso de
 
 Cada criterio de aceptación se respalda con evidencia **ejecutada y verde** de los niveles inferiores. Detalle y veredicto en el [Informe de Pruebas de Aceptación](Informe-de-Pruebas-de-Aceptacion) §3–§4.
 
-| Criterio | Requisito(s) | Funcional | Integración | Sistema / E2E | Veredicto |
-|----------|--------------|-----------|-------------|---------------|-----------|
-| ACC-01 | RF-01 | CPF-01/02 | INT-01 | E2E-02 (diseñado) | ✅ Aceptado |
-| ACC-02 | RF-02 | CPF-03 | INT-01 · **FI-01/02** (INC-02 corregido) | E2E-03 (diseñado) | ✅ Aceptado |
-| ACC-03 | RF-03 | CPF-04 | INT-02 · **FI-03** | E2E-04 (diseñado) | ✅ Aceptado |
-| ACC-04 | RF-04/RF-05 | CPF-06/07 | INT-04 · **CPF-08** | E2E-05 (diseñado) | ✅ Aceptado |
+| Criterio | Requisito(s) | Funcional | Integración | Sistema (no funcional K6) | Veredicto |
+|----------|--------------|-----------|-------------|---------------------------|-----------|
+| ACC-01 | RF-01 | CPF-01/02 | INT-01 | — | ✅ Aceptado |
+| ACC-02 | RF-02 | CPF-03 | INT-01 · **FI-01/02** (INC-02 corregido) | — | ✅ Aceptado |
+| ACC-03 | RF-03 | CPF-04 | INT-02 · **FI-03** | — | ✅ Aceptado |
+| ACC-04 | RF-04/RF-05 | CPF-06/07 | INT-04 · **CPF-08** | — | ✅ Aceptado |
 | ACC-05 | RF-06 | CPF-09 | INT-05 | — | ✅ Aceptado |
-| ACC-06 | RF-09 (control de acceso) | — | INT-08 | NF-SEC-01 (302 + cabeceras) | ✅ Aceptado |
+| ACC-06 | RF-09 (control de acceso) | — | INT-08 | NF-SEC-01/hdr (K6, 12/12 checks) — NF-SEC-02/03 pendientes en UAT | ✅ Aceptado con observación |
 | ACC-07 | FMCS (multiempresa) | — | **INT-07** (FMCS *cross-company*) | — | ✅ Aceptado |
 
-> Veredicto global del acta: **Producto Aceptado con observación** (revalidación E2E por UI en estabilización; no bloqueante). Sin defectos de severidad alta abiertos.
+> Veredicto global del acta: **Producto Aceptado con observación** (NF-SEC-02/03 —403 con sesión autenticada y logout— pendientes de cierre en la sesión UAT; no bloqueante). Sin defectos de severidad alta abiertos. El nivel de Sistema (Seguridad, Desempeño, Fiabilidad) se verificó con **K6** contra el entorno QA en la nube — ver [Informe de Pruebas de Sistema](Informe-de-Pruebas-de-Sistema) v3.0.
 
 ---
 
@@ -113,7 +113,7 @@ Cada criterio de aceptación se respalda con evidencia **ejecutada y verde** de 
 | Nivel | Diseño / Plan | Resultado / Informe |
 |-------|---------------|---------------------|
 | Unitario | [Plan de Pruebas Unitarias](Plan-de-Pruebas-Unitarias) | [Informe de Pruebas Unitarias](Informe-de-Pruebas-Unitarias) |
-| Funcional | [Diseño de Casos Funcionales](Diseno-de-Casos-de-Pruebas-Funcionales) | [Informe de Casos Funcionales](Informe-de-Casos-de-Pruebas-Funcionales) |
+| Funcional (Caja Negra) | [Plan de Pruebas de Caja Negra](Plan-de-Pruebas-de-Caja-Negra) | [Informe de Pruebas de Caja Negra](Informe-de-Pruebas-de-Caja-Negra) |
 | Integración | [Plan de Integración](Plan-de-Pruebas-de-Integracion) | [Informe de Integración](Informe-de-Pruebas-de-Integracion) ✅ (Hito 3) |
 | Sistema | [Plan de Sistema](Plan-de-Pruebas-de-Sistema) | [Informe de Sistema](Informe-de-Pruebas-de-Sistema) ✅ (Hito 3) |
 | Aceptación | [Plan de Aceptación](Plan-de-Pruebas-de-Aceptacion) | [Informe de Aceptación](Informe-de-Pruebas-de-Aceptacion) ✅ (Hito 3) |
